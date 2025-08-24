@@ -27,9 +27,11 @@ export async function chatLoop(mcpClient: MCPClient) {
 
 export async function main() {
     if (process.argv.length < 3) {
-        console.log("Usage: node build/index.js <path_to_server_script>");
+        console.log("Usage: node build/index.js <path_to_server_script1> [path_to_server_script2] ...");
         return;
     }
+    
+    const serverPaths = process.argv.slice(2);
     
     const clientOptions: MCPClientOptions = {
         apiKey: config.anthropicApiKey,
@@ -42,7 +44,7 @@ export async function main() {
     const mcpClient = new MCPClient(clientOptions);
     
     try {
-        await mcpClient.connectToServer(process.argv[2]);
+        await mcpClient.connectToServers(serverPaths);
         await chatLoop(mcpClient);
     } catch (err) {
         console.error("Fatal error:", err);
