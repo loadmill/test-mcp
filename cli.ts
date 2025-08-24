@@ -1,6 +1,6 @@
 import readline from "readline/promises";
 import { MCPClient, MCPClientOptions } from "./mcp-client.js";
-import { config } from "./config.js";
+import { loadMCPConfig } from "./config-loader.js";
 
 export async function chatLoop(mcpClient: MCPClient) {
     const rl = readline.createInterface({
@@ -26,29 +26,33 @@ export async function chatLoop(mcpClient: MCPClient) {
 }
 
 export async function main() {
-    if (process.argv.length < 3) {
-        console.log("Usage: node build/index.js <path_to_server_script1> [path_to_server_script2] ...");
-        return;
-    }
-    
-    const serverPaths = process.argv.slice(2);
-    
-    const clientOptions: MCPClientOptions = {
-        apiKey: config.anthropicApiKey,
-        model: config.defaultModel,
-        maxTokens: config.maxTokens,
-        clientName: config.clientName,
-        clientVersion: config.clientVersion,
-    };
-    
-    const mcpClient = new MCPClient(clientOptions);
+    const configPath = process.argv[2] || "mcp.config.json";
+    let mcpClient: MCPClient | null = null;
     
     try {
-        await mcpClient.connectToServers(serverPaths);
+        const config = loadMCPConfig(configPath);
+        
+        const clientOptions: MCPClientOptions = {
+            apiKey: config.mcpClient.apiKey,
+            model: config.mcpClient.model,
+            maxTokens: 1000,
+            clientName: "mcp-client-cli",
+            clientVersion: "1.0.0",
+        };
+        
+        mcpClient = new MCPClient(clientOptions);
+        
+        await mcpClient.connectToServers(config.mcpServers);
         await chatLoop(mcpClient);
     } catch (err) {
         console.error("Fatal error:", err);
+        if (err instanceof Error && err.message.includes("Config file not found")) {
+            console.log("Usage: node build/index.js [config-file-path]");
+            console.log("Default config file: mcp.config.json");
+        }
     } finally {
-        await mcpClient.cleanup();
+        if (mcpClient) {
+            await mcpClient.cleanup();
+        }
     }
 }

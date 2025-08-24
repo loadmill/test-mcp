@@ -20,6 +20,14 @@ interface ServerConnection {
     name: string;
 }
 
+interface ServerConfig {
+    command: string;
+    args: string[];
+    env?: {
+        [key: string]: string;
+    };
+}
+
 export class MCPClient {
     private servers: ServerConnection[] = [];
     private anthropic: Anthropic;
@@ -33,19 +41,15 @@ export class MCPClient {
         });
     }
 
-    async connectToServer(serverScriptPath: string) {
+    async connectToServer(name: string, config: ServerConfig) {
         try {
-            const isJs = serverScriptPath.endsWith(".js");
-            const isPy = serverScriptPath.endsWith(".py");
-            if (!isJs && !isPy) throw new Error("Server script must be a .js or .py file");
-
-            const command = isPy
-                ? (process.platform === "win32" ? "python" : "python3")
-                : process.execPath;
-
-            const transport = new StdioClientTransport({ command, args: [serverScriptPath] });
+            const transport = new StdioClientTransport({ 
+                command: config.command, 
+                args: config.args,
+                env: config.env 
+            });
             const client = new Client({ 
-                name: `${this.options.clientName}-${this.servers.length}`, 
+                name: `${this.options.clientName}-${name}`, 
                 version: this.options.clientVersion 
             });
 
@@ -61,20 +65,20 @@ export class MCPClient {
             this.servers.push({
                 client,
                 transport,
-                name: serverScriptPath.split('/').pop() || serverScriptPath
+                name
             });
 
             this.tools.push(...serverTools);
-            console.log(`Connected to server ${serverScriptPath} with tools:`, serverTools.map(t => t.name));
+            console.log(`Connected to server '${name}' with tools:`, serverTools.map(t => t.name));
         } catch (e) {
-            console.error("Failed to connect to MCP server:", serverScriptPath, e);
+            console.error(`Failed to connect to MCP server '${name}':`, e);
             throw e;
         }
     }
 
-    async connectToServers(serverScriptPaths: string[]) {
-        for (const serverPath of serverScriptPaths) {
-            await this.connectToServer(serverPath);
+    async connectToServers(servers: { [name: string]: ServerConfig }) {
+        for (const [name, config] of Object.entries(servers)) {
+            await this.connectToServer(name, config);
         }
         console.log("All servers connected. Total tools:", this.tools.map(t => t.name));
     }

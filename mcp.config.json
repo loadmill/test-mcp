@@ -1,0 +1,18 @@
+{
+  "version": "0.1",
+  "mcpClient": {
+    "provider": "anthropic",
+    "model": "claude-3-7-sonnet-latest",
+    "api_key_env": "${env:ANTHROPIC_API_KEY}"
+  },
+  "mcpServers": {
+    "dice": {
+      "command": "node",
+      "args": ["examples/dice-server.js"]
+    },
+    "coin": {
+      "command": "node", 
+      "args": ["examples/coin-server.js"]
+    }
+  }
+}
