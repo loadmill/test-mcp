@@ -1,5 +1,6 @@
 export interface TestStep {
-    prompt: string;
+    prompt?: string;
+    assert?: string;
 }
 
 export interface TestFile {
@@ -17,9 +18,14 @@ export interface TestResult {
 
 export interface StepResult {
     stepIndex: number;
-    prompt: string;
+    stepType: 'prompt' | 'assert';
+    input: string;
     response: string;
     success: boolean;
     error?: string;
     duration: number;
+    assertionResult?: {
+        passed: boolean;
+        reasoning: string;
+    };
 }

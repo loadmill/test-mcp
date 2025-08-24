@@ -1,9 +1,7 @@
 import fs from "fs";
-import path from "path";
 import dotenv from "dotenv";
 import { MCPConfig, ResolvedMCPConfig } from "./config-types.js";
 
-// Load environment variables
 dotenv.config();
 
 function resolveEnvVariable(value: string): string {

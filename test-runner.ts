@@ -48,37 +48,99 @@ export class TestRunner {
             const step = testFile.steps[i];
             const stepStartTime = Date.now();
             
-            console.log(`\n💬 Step ${i + 1}: ${step.prompt}`);
-            
-            try {
-                const response = await this.mcpClient.processQuery(step.prompt);
-                const stepDuration = Date.now() - stepStartTime;
+            if (step.prompt) {
+                // Handle prompt steps
+                console.log(`\n💬 Step ${i + 1}: ${step.prompt}`);
                 
-                console.log(`✅ Response (${stepDuration}ms):`);
-                console.log(response);
+                try {
+                    const response = await this.mcpClient.processQuery(step.prompt);
+                    const stepDuration = Date.now() - stepStartTime;
+                    
+                    console.log(`✅ Response (${stepDuration}ms):`);
+                    console.log(response);
+                    
+                    stepResults.push({
+                        stepIndex: i,
+                        stepType: 'prompt',
+                        input: step.prompt,
+                        response,
+                        success: true,
+                        duration: stepDuration
+                    });
+                } catch (error) {
+                    const stepDuration = Date.now() - stepStartTime;
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    
+                    console.log(`❌ Error (${stepDuration}ms): ${errorMessage}`);
+                    
+                    stepResults.push({
+                        stepIndex: i,
+                        stepType: 'prompt',
+                        input: step.prompt,
+                        response: "",
+                        success: false,
+                        error: errorMessage,
+                        duration: stepDuration
+                    });
+                    
+                    allStepsPassed = false;
+                }
+            } else if (step.assert) {
+                // Handle assertion steps
+                console.log(`\n🔍 Step ${i + 1} (Assertion): ${step.assert}`);
                 
+                try {
+                    const assertionResult = await this.mcpClient.evaluateAssertion(step.assert);
+                    const stepDuration = Date.now() - stepStartTime;
+                    
+                    if (assertionResult.passed) {
+                        console.log(`✅ Assertion PASSED (${stepDuration}ms):`);
+                        console.log(`   Reasoning: ${assertionResult.reasoning}`);
+                    } else {
+                        console.log(`❌ Assertion FAILED (${stepDuration}ms):`);
+                        console.log(`   Reasoning: ${assertionResult.reasoning}`);
+                        allStepsPassed = false;
+                    }
+                    
+                    stepResults.push({
+                        stepIndex: i,
+                        stepType: 'assert',
+                        input: step.assert,
+                        response: assertionResult.reasoning,
+                        success: assertionResult.passed,
+                        duration: stepDuration,
+                        assertionResult
+                    });
+                } catch (error) {
+                    const stepDuration = Date.now() - stepStartTime;
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    
+                    console.log(`❌ Assertion Error (${stepDuration}ms): ${errorMessage}`);
+                    
+                    stepResults.push({
+                        stepIndex: i,
+                        stepType: 'assert',
+                        input: step.assert,
+                        response: "",
+                        success: false,
+                        error: errorMessage,
+                        duration: stepDuration
+                    });
+                    
+                    allStepsPassed = false;
+                }
+            } else {
+                // Invalid step
+                console.log(`❌ Step ${i + 1}: Invalid step - must have either 'prompt' or 'assert'`);
                 stepResults.push({
                     stepIndex: i,
-                    prompt: step.prompt,
-                    response,
-                    success: true,
-                    duration: stepDuration
-                });
-            } catch (error) {
-                const stepDuration = Date.now() - stepStartTime;
-                const errorMessage = error instanceof Error ? error.message : String(error);
-                
-                console.log(`❌ Error (${stepDuration}ms): ${errorMessage}`);
-                
-                stepResults.push({
-                    stepIndex: i,
-                    prompt: step.prompt,
+                    stepType: 'prompt',
+                    input: 'Invalid step',
                     response: "",
                     success: false,
-                    error: errorMessage,
-                    duration: stepDuration
+                    error: "Step must have either 'prompt' or 'assert' field",
+                    duration: 0
                 });
-                
                 allStepsPassed = false;
             }
         }

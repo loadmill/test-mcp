@@ -152,6 +152,79 @@ export class MCPClient {
         return out.join("\n").trim();
     }
 
+    async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
+        const conversationSummary = messages.map(msg => {
+            if (msg.role === 'user') {
+                if (typeof msg.content === 'string') {
+                    return `User: ${msg.content}`;
+                } else if (Array.isArray(msg.content)) {
+                    return `User: ${msg.content.map((c: any) => 
+                        c.type === 'text' ? c.text : 
+                        c.type === 'tool_result' ? `[Tool Result: ${c.content}]` : 
+                        '[Unknown Content]'
+                    ).join(' ')}`;
+                }
+            } else if (Array.isArray(msg.content)) {
+                return `Assistant: ${msg.content.map((c: any) => 
+                    c.type === 'text' ? c.text :
+                    c.type === 'tool_use' ? `[Used tool: ${c.name}]` :
+                    '[Unknown Content]'
+                ).join(' ')}`;
+            }
+            return 'Unknown message';
+        }).join('\n');
+
+        const evaluationPrompt = `You are evaluating test assertions against a conversation history.
+
+CONVERSATION HISTORY:
+${conversationSummary}
+
+ASSERTION TO EVALUATE:
+${assertion}
+
+Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
+
+Respond in this exact JSON format:
+{
+  "passed": true/false,
+  "reasoning": "Brief explanation of why the assertion passed or failed"
+}`;
+
+        try {
+            const response = await this.anthropic.messages.create({
+                model: this.options.model,
+                max_tokens: 500,
+                messages: [{ role: "user", content: evaluationPrompt }],
+                tools: [], // No tools needed for assertion evaluation
+            });
+
+            const responseText = response.content
+                .filter(block => block.type === 'text')
+                .map(block => block.text)
+                .join(' ');
+
+            // Parse the JSON response
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                return {
+                    passed: false,
+                    reasoning: "Failed to parse assertion evaluation response"
+                };
+            }
+
+            const result = JSON.parse(jsonMatch[0]);
+            return {
+                passed: Boolean(result.passed),
+                reasoning: result.reasoning || "No reasoning provided"
+            };
+        } catch (error) {
+            return {
+                passed: false,
+                reasoning: `Error evaluating assertion: ${error instanceof Error ? error.message : String(error)}`
+            };
+        }
+    }
+
     async cleanup() {
         for (const server of this.servers) {
             await server.client.close();
