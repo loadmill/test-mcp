@@ -1,7 +1,7 @@
 # 📦 test-mcp
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/test-mcp"><img src="https://img.shields.io/npm/v/test-mcp?color=green" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/@loadmill/test-mcp"><img src="https://img.shields.io/npm/v/@loadmill/test-mcp?color=green" alt="npm version"></a>
   <a href="https://discord.gg/ABC"><img src="https://img.shields.io/discord/123?logo=discord&label=discord" alt="Discord"></a>
 </p>
 
@@ -28,24 +28,47 @@ Together, these let you automate and validate MCP server behavior with simple, r
 
 ```bash
 # using npm
-npm install -g test-mcp
+npm install -g @loadmill/test-mcp
 
 # or with pnpm
-pnpm add -g test-mcp
+pnpm add -g @loadmill/test-mcp
 ````
+
+When running from source:
+
+```bash
+git clone https://github.com/loadmill/test-mcp
+cd test-mcp
+npm install
+echo "ANTHROPIC_API_KEY=your_api_key_here" > .env
+npm run build
+```
 
 ---
 
 ## 🚀 Getting Started
 
-**1. Create a config (`mcp.config.json`)**
+To try `test-mcp` quickly with the included examples:
+
+```bash
+# from source
+node build/index.js
+```
+
+Example MCP servers are available in the `examples/` folder and a sample `mcp.config.json` is provided in the repo.
+
+---
+
+## 📑 Configuration & Test Format
+
+**1) Example config (`mcp.config.json`)**
 
 ```json
 {
   "version": "0.1",
   "mcpClient": {
     "provider": "anthropic",
-    "model": "claude-3-5-sonnet-20241022",
+    "model": "claude-3-7-sonnet-latest",
     "api_key_env": "${env:ANTHROPIC_API_KEY}"
   },
   "mcpServers": {
@@ -60,7 +83,7 @@ pnpm add -g test-mcp
 }
 ```
 
-**2. Write a test (`tests/bank-transaction.test.yaml`)**
+**2) Example test (`tests/bank-transaction.test.yaml`)**
 
 ```yaml
 description: "Maker Checker Bank - Transaction Creation and Rejection Flow"
@@ -71,20 +94,25 @@ steps:
   - assert: "Validate the transaction was created and rejected successfully"
 ```
 
-**3. Run**
+---
 
-By default, `test-mcp` will look for a `mcp.config.json` file in your project root and run all test files in the `tests/` folder that match `*.test.yaml`.
+## ▶️ How to run
+
+By default, `test-mcp` looks for `mcp.config.json` in the project root and runs tests in the `tests/` folder.
+
+**Globally installed:**
 
 ```bash
-# if installed globally
 test-mcp
+```
 
-# if running from source
-npm run build
+**From source:**
+
+```bash
 node build/index.js
 ```
 
-To be explicit, you can point to a specific config or test directory:
+Point to a specific config or tests directory:
 
 ```bash
 test-mcp --config mcp.config.json --tests-dir ./tests
@@ -92,7 +120,7 @@ test-mcp --config mcp.config.json --tests-dir ./tests
 
 ---
 
-## ⚙️ CLI Options
+## 💻 CLI Flags
 
 ```
 Options:
@@ -104,20 +132,20 @@ Options:
 
 ---
 
-## 🔍 Test Discovery
+## 🔎 Test Discovery
 
-Currently, `test-mcp` runs all test files ending in `.test.yaml` directly under the `tests/` folder.
-Subfolders and full glob patterns (like `**/*.test.yaml`) are planned for future support.
+All files ending in `.test.yaml` under the `tests/` directory are executed.
+Recursive discovery and full glob patterns are planned for later.
 
 ---
 
 ## 💬 Interactive Mode
 
-```bash
-test-mcp --interactive
-```
+Run the client without tests and chat with your MCP servers:
 
-Interactive mode lets you chat with your MCP servers using the same configuration instead of running tests.
+```bash
+test-mcp -i
+```
 
 ---
 
