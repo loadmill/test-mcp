@@ -91,9 +91,9 @@ mcp-flow --config mcp.config.json --test tests/bank-transaction.test.yaml
 
 * [x] Headless MCP client with Anthropic support
 * [x] Support for `stdio` transport
+* [x] Evaluator for natural-language assertions
 * [ ] Support for `http` transport
 * [ ] OpenAI support
-* [ ] Evaluator for natural-language assertions
 * [ ] CI-friendly reports
 
 ---
