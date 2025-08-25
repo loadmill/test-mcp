@@ -1,12 +1,30 @@
 {
   "name": "@loadmill/mcp-test",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "build/index.js",
+  "bin": {
+    "test-mcp": "./bin/test-mcp"
+  },
+  "files": [
+    "build/**/*",
+    "bin/**/*",
+    "README.md",
+    "mcp.config.json"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\""
   },
-  "keywords": [],
+  "keywords": [
+  "mcp",
+  "model-context-protocol",
+  "testing",
+  "automation",
+  "ai",
+  "llm",
+  "agent",
+  "cli"
+  ],
   "author": "",
   "license": "ISC",
   "type": "module",

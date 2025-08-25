@@ -8,11 +8,11 @@
   "mcpServers": {
     "dice": {
       "command": "node",
-      "args": ["examples/dice-server.js"]
+      "args": ["examples/dice-mcp-server.js"]
     },
     "coin": {
       "command": "node", 
-      "args": ["examples/coin-server.js"]
+      "args": ["examples/coin-mcp-server.js"]
     }
   }
 }
