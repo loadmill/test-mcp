@@ -26,7 +26,7 @@ If you’re building an MCP server, test-mcp helps you validate it end-to-end in
 
 ---
 
-## 💡 What's `test-mcp`? {#whats-test-mcp}
+<h2 id="whats-test-mcp">💡 What's `test-mcp`?</h2>
 
 `test-mcp` gives you three core components:
 
@@ -38,7 +38,7 @@ Together, these let you automate and validate MCP server behavior with simple, r
 
 ---
 
-## 🏗️ Installation {#installation}
+<h2 id="installation">🏗️ Installation</h2>
 
 ```bash
 # using npm
@@ -60,7 +60,7 @@ npm run build
 
 ---
 
-## 🚀 Getting Started {#getting-started}
+<h2 id="getting-started">🚀 Getting Started</h2>
 
 To try `test-mcp` quickly with the included examples:
 
@@ -73,7 +73,7 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
 
 ---
 
-## 📑 Configuration & Test Format {#configuration--test-format}
+<h2 id="configuration--test-format">📑 Configuration & Test Format</h2>
 
 **1) Example config (`mcp.config.json`)**
 
@@ -110,7 +110,7 @@ steps:
 
 ---
 
-## ▶️ How to run {#how-to-run}
+<h2 id="how-to-run">▶️ How to run</h2>
 
 By default, `test-mcp` looks for `mcp.config.json` in the project root and runs tests in the `tests/` folder.
 
@@ -134,7 +134,7 @@ test-mcp --config mcp.config.json --tests-dir ./tests
 
 ---
 
-## 💻 CLI Flags {#cli-flags}
+<h2 id="cli-flags">💻 CLI Flags</h2>
 
 ```
 Options:
@@ -146,14 +146,14 @@ Options:
 
 ---
 
-## 🔎 Test Discovery {#test-discovery}
+<h2 id="test-discovery">🔎 Test Discovery</h2>
 
 All files ending in `.test.yaml` under the `tests/` directory are executed.
 Recursive discovery and full glob patterns are planned for later.
 
 ---
 
-## 💬 Interactive Mode {#interactive-mode}
+<h2 id="interactive-mode">💬 Interactive Mode</h2>
 
 Run the client without tests and chat with your MCP servers:
 
@@ -163,7 +163,7 @@ test-mcp -i
 
 ---
 
-## 🛣️ Roadmap {#roadmap}
+<h2 id="roadmap">🛣️ Roadmap</h2>
 
 * [x] Headless MCP client with Anthropic support
 * [x] Support for `stdio` transport
@@ -175,12 +175,12 @@ test-mcp -i
 
 ---
 
-## 🤝 Contributing {#contributing}
+<h2 id="contributing">🤝 Contributing</h2>
 
 Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](./.github/CONTRIBUTING.md).
 
 ---
 
-## 📄 License {#license}
+<h2 id="license">📄 License</h2>
 
 Apache License 2.0 © [The test-mcp Authors](LICENSE)
