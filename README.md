@@ -6,17 +6,17 @@
 </p>
 
 <p align="center">
-  <a href="#-whats-test-mcp">What's test-mcp?</a> •
-  <a href="#-installation">Installation</a> •
-  <a href="#-getting-started">Getting Started</a> •
-  <a href="#-configuration--test-format">Configuration & Test Format</a> •
-  <a href="#️-how-to-run">How to Run</a> •
-  <a href="#-cli-flags">CLI Flags</a> •
-  <a href="#-test-discovery">Test Discovery</a> •
-  <a href="#-interactive-mode">Interactive Mode</a> •
-  <a href="#-roadmap">Roadmap</a> •
-  <a href="#-contributing">Contributing</a> •
-  <a href="#-license">License</a>
+  <a href="#whats-test-mcp">What's test-mcp?</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#configuration--test-format">Configuration & Test Format</a> •
+  <a href="#how-to-run">How to Run</a> •
+  <a href="#cli-flags">CLI Flags</a> •
+  <a href="#test-discovery">Test Discovery</a> •
+  <a href="#interactive-mode">Interactive Mode</a> •
+  <a href="#roadmap">Roadmap</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#license">License</a>
 </p>
 
 ---
@@ -26,7 +26,7 @@ If you’re building an MCP server, test-mcp helps you validate it end-to-end in
 
 ---
 
-## 💡 What's `test-mcp`?
+## 💡 What's `test-mcp`? {#whats-test-mcp}
 
 `test-mcp` gives you three core components:
 
@@ -38,7 +38,7 @@ Together, these let you automate and validate MCP server behavior with simple, r
 
 ---
 
-## 🏗️ Installation
+## 🏗️ Installation {#installation}
 
 ```bash
 # using npm
@@ -60,7 +60,7 @@ npm run build
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started {#getting-started}
 
 To try `test-mcp` quickly with the included examples:
 
@@ -73,7 +73,7 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
 
 ---
 
-## 📑 Configuration & Test Format
+## 📑 Configuration & Test Format {#configuration--test-format}
 
 **1) Example config (`mcp.config.json`)**
 
@@ -110,7 +110,7 @@ steps:
 
 ---
 
-## ▶️ How to run
+## ▶️ How to run {#how-to-run}
 
 By default, `test-mcp` looks for `mcp.config.json` in the project root and runs tests in the `tests/` folder.
 
@@ -134,7 +134,7 @@ test-mcp --config mcp.config.json --tests-dir ./tests
 
 ---
 
-## 💻 CLI Flags
+## 💻 CLI Flags {#cli-flags}
 
 ```
 Options:
@@ -146,14 +146,14 @@ Options:
 
 ---
 
-## 🔎 Test Discovery
+## 🔎 Test Discovery {#test-discovery}
 
 All files ending in `.test.yaml` under the `tests/` directory are executed.
 Recursive discovery and full glob patterns are planned for later.
 
 ---
 
-## 💬 Interactive Mode
+## 💬 Interactive Mode {#interactive-mode}
 
 Run the client without tests and chat with your MCP servers:
 
@@ -163,7 +163,7 @@ test-mcp -i
 
 ---
 
-## 🛣️ Roadmap
+## 🛣️ Roadmap {#roadmap}
 
 * [x] Headless MCP client with Anthropic support
 * [x] Support for `stdio` transport
@@ -175,12 +175,12 @@ test-mcp -i
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing {#contributing}
 
 Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](./.github/CONTRIBUTING.md).
 
 ---
 
-## 📄 License
+## 📄 License {#license}
 
 Apache License 2.0 © [The test-mcp Authors](LICENSE)
