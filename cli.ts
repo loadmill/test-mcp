@@ -3,6 +3,7 @@ import minimist from "minimist";
 import { MCPClient, MCPClientOptions } from "./mcp-client.js";
 import { loadMCPConfig } from "./config-loader.js";
 import { TestRunner } from "./test-runner.js";
+import { createLLM } from "./llm.js";
 
 export async function chatLoop(mcpClient: MCPClient) {
     const rl = readline.createInterface({
@@ -72,15 +73,15 @@ export async function main() {
     try {
         const config = loadMCPConfig(configPath);
         
+        const llm = createLLM(config.mcpClient);
+        
         const clientOptions: MCPClientOptions = {
-            apiKey: config.mcpClient.apiKey,
-            model: config.mcpClient.model,
             maxTokens: 1000,
             clientName: "mcp-client-cli",
             clientVersion: "1.0.0",
         };
         
-        mcpClient = new MCPClient(clientOptions);
+        mcpClient = new MCPClient(llm, clientOptions);
         
         await mcpClient.connectToServers(config.mcpServers);
         

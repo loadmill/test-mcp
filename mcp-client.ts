@@ -1,14 +1,12 @@
-import { Anthropic } from "@anthropic-ai/sdk";
 import { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages/messages.mjs";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { LLM } from "./llm.js";
 
 // message history for the whole run
 const messages: MessageParam[] = [];
 
 export interface MCPClientOptions {
-    apiKey: string;
-    model: string;
     maxTokens: number;
     clientName: string;
     clientVersion: string;
@@ -30,15 +28,13 @@ interface ServerConfig {
 
 export class MCPClient {
     private servers: ServerConnection[] = [];
-    private anthropic: Anthropic;
+    private llm: LLM;
     private tools: Tool[] = [];
     private options: MCPClientOptions;
 
-    constructor(options: MCPClientOptions) {
+    constructor(llm: LLM, options: MCPClientOptions) {
+        this.llm = llm;
         this.options = options;
-        this.anthropic = new Anthropic({
-            apiKey: options.apiKey,
-        });
     }
 
     async connectToServer(name: string, config: ServerConfig) {
@@ -87,11 +83,9 @@ export class MCPClient {
         // const messages: MessageParam[] = [{ role: "user", content: query }];
         messages.push({ role: "user", content: query });
 
-        let response = await this.anthropic.messages.create({
-            model: this.options.model,
-            max_tokens: this.options.maxTokens,
-            messages,
-            tools: this.tools,
+        let response = await this.llm.generate(messages, { 
+            maxTokens: this.options.maxTokens, 
+            tools: this.tools 
         });
 
         messages.push({ role: "assistant", content: response.content });
@@ -137,11 +131,9 @@ export class MCPClient {
         if (toolResults.length > 0) {
             messages.push({ role: "user", content: toolResults });
 
-            response = await this.anthropic.messages.create({
-                model: this.options.model,
-                max_tokens: this.options.maxTokens,
-                messages,
-                tools: this.tools,
+            response = await this.llm.generate(messages, { 
+                maxTokens: this.options.maxTokens, 
+                tools: this.tools 
             });
 
             messages.push({ role: "assistant", content: response.content });
@@ -152,8 +144,12 @@ export class MCPClient {
         return out.join("\n").trim();
     }
 
+    getMessageSnapshot(): MessageParam[] {
+        return [...messages];
+    }
+
     async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
-        const conversationSummary = messages.map(msg => {
+        const conversationSummary = this.getMessageSnapshot().map(msg => {
             if (msg.role === 'user') {
                 if (typeof msg.content === 'string') {
                     return `User: ${msg.content}`;
@@ -191,18 +187,8 @@ Respond in this exact JSON format:
 }`;
 
         try {
-            const response = await this.anthropic.messages.create({
-                model: this.options.model,
-                max_tokens: 500,
-                messages: [{ role: "user", content: evaluationPrompt }],
-                tools: [], // No tools needed for assertion evaluation
-            });
-
-            const responseText = response.content
-                .filter(block => block.type === 'text')
-                .map(block => block.text)
-                .join(' ');
-
+            const responseText = await this.llm.evaluate(this.getMessageSnapshot(), evaluationPrompt);
+            
             // Parse the JSON response
             const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) {
