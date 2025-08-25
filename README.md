@@ -5,6 +5,20 @@
   <a href="https://discord.gg/ABC"><img src="https://img.shields.io/discord/123?logo=discord&label=discord" alt="Discord"></a>
 </p>
 
+<p align="center">
+  <a href="#-whats-test-mcp">What's test-mcp?</a> •
+  <a href="#-installation">Installation</a> •
+  <a href="#-getting-started">Getting Started</a> •
+  <a href="#-configuration--test-format">Configuration & Test Format</a> •
+  <a href="#️-how-to-run">How to Run</a> •
+  <a href="#-cli-flags">CLI Flags</a> •
+  <a href="#-test-discovery">Test Discovery</a> •
+  <a href="#-interactive-mode">Interactive Mode</a> •
+  <a href="#-roadmap">Roadmap</a> •
+  <a href="#-contributing">Contributing</a> •
+  <a href="#-license">License</a>
+</p>
+
 ---
 
 **`test-mcp`** is the first headless [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) client for automated testing.  
