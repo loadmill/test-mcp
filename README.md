@@ -1,20 +1,20 @@
-# 📦 mcp-flow
+# 📦 test-mcp
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/mcp-flow"><img src="https://img.shields.io/npm/v/mcp-flow?color=green" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/test-mcp"><img src="https://img.shields.io/npm/v/test-mcp?color=green" alt="npm version"></a>
   <a href="https://discord.gg/ABC"><img src="https://img.shields.io/discord/123?logo=discord&label=discord" alt="Discord"></a>
 </p>
 
 ---
 
-**`mcp-flow`** is the first headless [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) client for automated testing.
-If you’re building an MCP server, mcp-flow helps you test it end-to-end in a fast and repeatable way.
+**`test-mcp`** is the first headless [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) client for automated testing.  
+If you’re building an MCP server, test-mcp helps you validate it end-to-end in a fast and repeatable way.
 
 ---
 
-## 💡 What's `mcp-flow`?
+## 💡 What's `test-mcp`?
 
-`mcp-flow` gives you three core components:
+`test-mcp` gives you three core components:
 
 * **Configuration** – define your MCP servers and LLM provider in a single JSON file.
 * **Test Files** – write flows of natural-language prompts and assertions in YAML.
@@ -28,11 +28,11 @@ Together, these let you automate and validate MCP server behavior with simple, r
 
 ```bash
 # using npm
-npm install -g mcp-flow
+npm install -g test-mcp
 
 # or with pnpm
-pnpm add -g mcp-flow
-```
+pnpm add -g test-mcp
+````
 
 ---
 
@@ -73,17 +73,51 @@ steps:
 
 **3. Run**
 
-By default, `mcp-flow` will look for a `mcp.config.json` file in your project root and run all test files in the `tests/` folder that match `**/*.test.yaml`.
+By default, `test-mcp` will look for a `mcp.config.json` file in your project root and run all test files in the `tests/` folder that match `*.test.yaml`.
 
 ```bash
-mcp-flow
+# if installed globally
+test-mcp
+
+# if running from source
+npm run build
+node build/index.js
 ```
 
-To be explicit, you can point to a specific config or test file:
+To be explicit, you can point to a specific config or test directory:
 
 ```bash
-mcp-flow --config mcp.config.json --test tests/bank-transaction.test.yaml
+test-mcp --config mcp.config.json --tests-dir ./tests
 ```
+
+---
+
+## ⚙️ CLI Options
+
+```
+Options:
+  -c, --config <file>   Path to config file (default: mcp.config.json)
+  -t, --tests-dir <dir> Directory containing test files (default: tests)
+  -i, --interactive     Run in interactive chat mode
+  -h, --help            Show help
+```
+
+---
+
+## 🔍 Test Discovery
+
+Currently, `test-mcp` runs all test files ending in `.test.yaml` directly under the `tests/` folder.
+Subfolders and full glob patterns (like `**/*.test.yaml`) are planned for future support.
+
+---
+
+## 💬 Interactive Mode
+
+```bash
+test-mcp --interactive
+```
+
+Interactive mode lets you chat with your MCP servers using the same configuration instead of running tests.
 
 ---
 
@@ -95,6 +129,7 @@ mcp-flow --config mcp.config.json --test tests/bank-transaction.test.yaml
 * [ ] Support for `http` transport
 * [ ] OpenAI support
 * [ ] CI-friendly reports
+* [ ] Subfolder/glob test discovery
 
 ---
 
@@ -106,4 +141,4 @@ Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](./.gith
 
 ## 📄 License
 
-Apache License 2.0 © [The mcp-flow Authors](LICENSE)
+Apache License 2.0 © [The test-mcp Authors](LICENSE)
