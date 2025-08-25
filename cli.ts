@@ -45,7 +45,7 @@ export async function main() {
     });
 
     if (args.help) {
-        console.log('MCP Flow - Test Runner and Interactive Client');
+        console.log('test-mcp – Automated MCP Test Runner and Client');
         console.log('');
         console.log('Usage: node build/index.js [options]');
         console.log('');
