@@ -18,7 +18,7 @@ export interface TestResult {
 
 export interface StepResult {
     stepIndex: number;
-    stepType: 'prompt' | 'assert';
+    stepType: "prompt" | "assert";
     input: string;
     response: string;
     success: boolean;

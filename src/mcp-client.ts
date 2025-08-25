@@ -39,14 +39,14 @@ export class MCPClient {
 
     async connectToServer(name: string, config: ServerConfig) {
         try {
-            const transport = new StdioClientTransport({ 
-                command: config.command, 
+            const transport = new StdioClientTransport({
+                command: config.command,
                 args: config.args,
-                env: config.env 
+                env: config.env
             });
-            const client = new Client({ 
-                name: `${this.options.clientName}-${name}`, 
-                version: this.options.clientVersion 
+            const client = new Client({
+                name: `${this.options.clientName}-${name}`,
+                version: this.options.clientVersion
             });
 
             await client.connect(transport);
@@ -83,9 +83,9 @@ export class MCPClient {
         // const messages: MessageParam[] = [{ role: "user", content: query }];
         messages.push({ role: "user", content: query });
 
-        let response = await this.llm.generate(messages, { 
-            maxTokens: this.options.maxTokens, 
-            tools: this.tools 
+        let response = await this.llm.generate(messages, {
+            maxTokens: this.options.maxTokens,
+            tools: this.tools
         });
 
         messages.push({ role: "assistant", content: response.content });
@@ -96,7 +96,7 @@ export class MCPClient {
             if (block.type === "tool_use") {
                 const name = block.name;
                 const args = (block.input as Record<string, unknown>) ?? {};
-                
+
                 // Find which server has this tool
                 let mcpResult = null;
                 for (const server of this.servers) {
@@ -131,16 +131,16 @@ export class MCPClient {
         if (toolResults.length > 0) {
             messages.push({ role: "user", content: toolResults });
 
-            response = await this.llm.generate(messages, { 
-                maxTokens: this.options.maxTokens, 
-                tools: this.tools 
+            response = await this.llm.generate(messages, {
+                maxTokens: this.options.maxTokens,
+                tools: this.tools
             });
 
             messages.push({ role: "assistant", content: response.content });
         }
 
         const out: string[] = [];
-        for (const b of response.content) if (b.type === "text") out.push(b.text);
+        for (const b of response.content) {if (b.type === "text") {out.push(b.text);}}
         return out.join("\n").trim();
     }
 
@@ -150,25 +150,25 @@ export class MCPClient {
 
     async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
         const conversationSummary = this.getMessageSnapshot().map(msg => {
-            if (msg.role === 'user') {
-                if (typeof msg.content === 'string') {
+            if (msg.role === "user") {
+                if (typeof msg.content === "string") {
                     return `User: ${msg.content}`;
                 } else if (Array.isArray(msg.content)) {
-                    return `User: ${msg.content.map((c: any) => 
-                        c.type === 'text' ? c.text : 
-                        c.type === 'tool_result' ? `[Tool Result: ${c.content}]` : 
-                        '[Unknown Content]'
-                    ).join(' ')}`;
+                    return `User: ${msg.content.map((c: any) =>
+                        c.type === "text" ? c.text :
+                            c.type === "tool_result" ? `[Tool Result: ${c.content}]` :
+                                "[Unknown Content]"
+                    ).join(" ")}`;
                 }
             } else if (Array.isArray(msg.content)) {
-                return `Assistant: ${msg.content.map((c: any) => 
-                    c.type === 'text' ? c.text :
-                    c.type === 'tool_use' ? `[Used tool: ${c.name}]` :
-                    '[Unknown Content]'
-                ).join(' ')}`;
+                return `Assistant: ${msg.content.map((c: any) =>
+                    c.type === "text" ? c.text :
+                        c.type === "tool_use" ? `[Used tool: ${c.name}]` :
+                            "[Unknown Content]"
+                ).join(" ")}`;
             }
-            return 'Unknown message';
-        }).join('\n');
+            return "Unknown message";
+        }).join("\n");
 
         const evaluationPrompt = `You are evaluating test assertions against a conversation history.
 
@@ -188,7 +188,7 @@ Respond in this exact JSON format:
 
         try {
             const responseText = await this.llm.evaluate(this.getMessageSnapshot(), evaluationPrompt);
-            
+
             // Parse the JSON response
             const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             if (!jsonMatch) {

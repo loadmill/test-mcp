@@ -40,7 +40,7 @@ export function loadMCPConfig(configPath: string = "mcp.config.json"): ResolvedM
 
     const configContent = fs.readFileSync(configPath, "utf-8");
     let config: MCPConfig;
-    
+
     try {
         config = JSON.parse(configContent);
     } catch (error) {

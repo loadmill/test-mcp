@@ -30,61 +30,61 @@ export async function chatLoop(mcpClient: MCPClient) {
 
 export async function main() {
     const args = minimist(process.argv.slice(2), {
-        boolean: ['interactive', 'i', 'help', 'h'],
-        string: ['config', 'c', 'tests-dir', 't'],
+        boolean: ["interactive", "i", "help", "h"],
+        string: ["config", "c", "tests-dir", "t"],
         default: {
-            config: 'mcp.config.json',
-            'tests-dir': 'tests'
+            config: "mcp.config.json",
+            "tests-dir": "tests"
         },
         alias: {
-            'interactive': 'i',
-            'config': 'c',
-            'tests-dir': 't',
-            'help': 'h'
+            "interactive": "i",
+            "config": "c",
+            "tests-dir": "t",
+            "help": "h"
         }
     });
 
     if (args.help) {
-        console.log('test-mcp – Automated MCP Test Runner and Client');
-        console.log('');
-        console.log('Usage: node build/index.js [options]');
-        console.log('');
-        console.log('Options:');
-        console.log('  -i, --interactive     Run in interactive chat mode');
-        console.log('  -c, --config <file>   Config file path (default: mcp.config.json)');
-        console.log('  -t, --tests-dir <dir> Tests directory (default: tests)');
-        console.log('  -h, --help            Show help');
-        console.log('');
-        console.log('Examples:');
-        console.log('  node build/index.js                           # Run tests (default mode)');
-        console.log('  node build/index.js -i                        # Interactive mode');
-        console.log('  node build/index.js -c my-config.json         # Use custom config');
-        console.log('  node build/index.js -t ./my-tests             # Use custom tests directory');
-        console.log('  node build/index.js -i -c my-config.json      # Interactive with custom config');
+        console.log("test-mcp – Automated MCP Test Runner and Client");
+        console.log("");
+        console.log("Usage: node build/index.js [options]");
+        console.log("");
+        console.log("Options:");
+        console.log("  -i, --interactive     Run in interactive chat mode");
+        console.log("  -c, --config <file>   Config file path (default: mcp.config.json)");
+        console.log("  -t, --tests-dir <dir> Tests directory (default: tests)");
+        console.log("  -h, --help            Show help");
+        console.log("");
+        console.log("Examples:");
+        console.log("  node build/index.js                           # Run tests (default mode)");
+        console.log("  node build/index.js -i                        # Interactive mode");
+        console.log("  node build/index.js -c my-config.json         # Use custom config");
+        console.log("  node build/index.js -t ./my-tests             # Use custom tests directory");
+        console.log("  node build/index.js -i -c my-config.json      # Interactive with custom config");
         return;
     }
 
     const interactiveMode = args.interactive;
     const configPath = args.config;
-    const testsDir = args['tests-dir'];
+    const testsDir = args["tests-dir"];
 
     let mcpClient: MCPClient | null = null;
-    
+
     try {
         const config = loadMCPConfig(configPath);
-        
+
         const llm = createLLM(config.mcpClient);
-        
+
         const clientOptions: MCPClientOptions = {
             maxTokens: 1000,
             clientName: "mcp-client-cli",
             clientVersion: "1.0.0",
         };
-        
+
         mcpClient = new MCPClient(llm, clientOptions);
-        
+
         await mcpClient.connectToServers(config.mcpServers);
-        
+
         if (interactiveMode) {
             console.log("💬 Running in interactive mode");
             await chatLoop(mcpClient);
@@ -92,7 +92,7 @@ export async function main() {
             console.log("🧪 Running tests (default mode)");
             const testRunner = new TestRunner(mcpClient);
             const results = await testRunner.runAllTests(testsDir);
-            
+
             // Exit with appropriate code
             const allPassed = results.every(r => r.passed);
             process.exit(allPassed ? 0 : 1);
