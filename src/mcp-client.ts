@@ -27,17 +27,23 @@ interface ServerConfig {
     };
 }
 
+interface ToolRegistration {
+    serverName: string;
+    originalToolName: string;
+}
+
 export class MCPClient {
     private servers: ServerConnection[] = [];
     private llm: LLM;
     private tools: Tool[] = [];
+    private toolRegistry: Map<string, ToolRegistration> = new Map(); // namespacedToolName -> {serverName, originalToolName}
     private options: MCPClientOptions;
     constructor(llm: LLM, options: MCPClientOptions) {
         this.llm = llm;
         this.options = options;
     }
 
-    async connectToServer(name: string, config: ServerConfig) {
+    async connectToServer(serverName: string, config: ServerConfig) {
         try {
             const transport = new StdioClientTransport({
                 command: config.command,
@@ -45,29 +51,41 @@ export class MCPClient {
                 env: config.env
             });
             const client = new Client({
-                name: `${this.options.clientName}-${name}`,
+                name: `${this.options.clientName}-${serverName}`,
                 version: this.options.clientVersion
             });
 
             await client.connect(transport);
 
             const toolsResult = await client.listTools();
-            const serverTools = toolsResult.tools.map(t => ({
-                name: t.name,
-                description: t.description,
-                input_schema: t.inputSchema,
-            }));
+            const serverTools = toolsResult.tools.map(tool => {
+                const namespacedName = `${serverName}_${tool.name}`;
+                return {
+                    name: namespacedName, // Use namespaced name for LLM
+                    description: tool.description,
+                    input_schema: tool.inputSchema,
+                };
+            });
 
             this.servers.push({
                 client,
                 transport,
-                name
+                name: serverName
             });
 
+            // Register each tool with its namespaced name and original details
+            for (const originalTool of toolsResult.tools) {
+                const namespacedName = `${serverName}_${originalTool.name}`;
+                this.toolRegistry.set(namespacedName, {
+                    serverName: serverName,
+                    originalToolName: originalTool.name
+                });
+            }
+
             this.tools.push(...serverTools);
-            console.log(`Connected to server '${name}' with tools:`, serverTools.map(t => t.name));
+            console.log(`Connected to server '${serverName}' with tools:`, serverTools.map(t => t.name));
         } catch (e) {
-            console.error(`Failed to connect to MCP server '${name}':`, e);
+            console.error(`Failed to connect to MCP server '${serverName}':`, e);
             throw e;
         }
     }
@@ -97,26 +115,30 @@ export class MCPClient {
                 const name = block.name;
                 const args = (block.input as Record<string, unknown>) ?? {};
 
-                // Find which server has this tool
-                let mcpResult = null;
-                for (const server of this.servers) {
-                    try {
-                        logger.mcpToolCall(server.name, name, args);
-                        
-                        mcpResult = await server.client.callTool({ name, arguments: args });
-                        
-                        logger.mcpToolResult(server.name, name, mcpResult);
-                        
-                        break;
-                    } catch (e) {
-                        logger.mcpError(server.name, `tool call ${name}`, e);
-                        // Tool not found on this server, try next
-                        continue;
-                    }
+                // Look up which server has this namespaced tool
+                const toolRegistration = this.toolRegistry.get(name);
+                if (!toolRegistration) {
+                    throw new Error(`Tool '${name}' not found on any connected server`);
                 }
 
-                if (!mcpResult) {
-                    throw new Error(`Tool '${name}' not found on any connected server`);
+                const server = this.servers.find(s => s.name === toolRegistration.serverName);
+                if (!server) {
+                    throw new Error(`Server '${toolRegistration.serverName}' for tool '${name}' is not connected`);
+                }
+
+                logger.mcpToolCall(server.name, name, toolRegistration.originalToolName, args);
+                
+                let mcpResult;
+                try {
+                    // Call the tool using its original name on the server
+                    mcpResult = await server.client.callTool({ 
+                        name: toolRegistration.originalToolName, 
+                        arguments: args 
+                    });
+                    logger.mcpToolResult(server.name, name, toolRegistration.originalToolName, mcpResult);
+                } catch (e) {
+                    logger.mcpError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
+                    throw e;
                 }
 
                 const textOut = Array.isArray(mcpResult.content)
@@ -178,19 +200,19 @@ export class MCPClient {
 
         const evaluationPrompt = `You are evaluating test assertions against a conversation history.
 
-            CONVERSATION HISTORY:
-            ${conversationSummary}
+CONVERSATION HISTORY:
+${conversationSummary}
 
-            ASSERTION TO EVALUATE:
-            ${assertion}
+ASSERTION TO EVALUATE:
+${assertion}
 
-            Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
+Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
 
-            Respond in this exact JSON format:
-            {
-            "passed": true/false,
-            "reasoning": "Brief explanation of why the assertion passed or failed"
-            }`;
+Respond in this exact JSON format:
+{
+"passed": true/false,
+"reasoning": "Brief explanation of why the assertion passed or failed"
+}`;
 
         try {
             const responseText = await this.llm.evaluate(this.getMessageSnapshot(), evaluationPrompt);
