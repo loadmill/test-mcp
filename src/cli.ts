@@ -30,7 +30,7 @@ export async function chatLoop(mcpClient: MCPClient) {
 
 export async function main() {
     const args = minimist(process.argv.slice(2), {
-        boolean: ["interactive", "i", "help", "h"],
+        boolean: ["interactive", "i", "help", "h", "trace"],
         string: ["config", "c", "tests-dir", "t"],
         default: {
             config: "mcp.config.json",
@@ -53,6 +53,7 @@ export async function main() {
         console.log("  -i, --interactive     Run in interactive chat mode");
         console.log("  -c, --config <file>   Config file path (default: mcp.config.json)");
         console.log("  -t, --tests-dir <dir> Tests directory (default: tests)");
+        console.log("      --trace           Enable detailed request/response tracing");
         console.log("  -h, --help            Show help");
         console.log("");
         console.log("Examples:");
@@ -67,6 +68,11 @@ export async function main() {
     const interactiveMode = args.interactive;
     const configPath = args.config;
     const testsDir = args["tests-dir"];
+    const traceMode = args.trace;
+    
+    if (traceMode) {
+        process.env.TRACE = 'true';
+    }
 
     let mcpClient: MCPClient | null = null;
 

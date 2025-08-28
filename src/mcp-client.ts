@@ -2,6 +2,7 @@ import { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages/message
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { LLM } from "./llm.js";
+import { logger } from "./logger.js";
 
 // message history for the whole run
 const messages: MessageParam[] = [];
@@ -31,7 +32,6 @@ export class MCPClient {
     private llm: LLM;
     private tools: Tool[] = [];
     private options: MCPClientOptions;
-
     constructor(llm: LLM, options: MCPClientOptions) {
         this.llm = llm;
         this.options = options;
@@ -101,9 +101,15 @@ export class MCPClient {
                 let mcpResult = null;
                 for (const server of this.servers) {
                     try {
+                        logger.mcpToolCall(server.name, name, args);
+                        
                         mcpResult = await server.client.callTool({ name, arguments: args });
+                        
+                        logger.mcpToolResult(server.name, name, mcpResult);
+                        
                         break;
                     } catch (e) {
+                        logger.mcpError(server.name, `tool call ${name}`, e);
                         // Tool not found on this server, try next
                         continue;
                     }
@@ -172,19 +178,19 @@ export class MCPClient {
 
         const evaluationPrompt = `You are evaluating test assertions against a conversation history.
 
-CONVERSATION HISTORY:
-${conversationSummary}
+            CONVERSATION HISTORY:
+            ${conversationSummary}
 
-ASSERTION TO EVALUATE:
-${assertion}
+            ASSERTION TO EVALUATE:
+            ${assertion}
 
-Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
+            Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
 
-Respond in this exact JSON format:
-{
-  "passed": true/false,
-  "reasoning": "Brief explanation of why the assertion passed or failed"
-}`;
+            Respond in this exact JSON format:
+            {
+            "passed": true/false,
+            "reasoning": "Brief explanation of why the assertion passed or failed"
+            }`;
 
         try {
             const responseText = await this.llm.evaluate(this.getMessageSnapshot(), evaluationPrompt);
