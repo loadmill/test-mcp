@@ -2,7 +2,7 @@
   "version": "0.1",
   "mcpClient": {
     "provider": "anthropic",
-    "model": "claude-3-7-sonnet-latest",
+    "model": "claude-3-5-haiku-latest",
     "api_key_env": "${env:ANTHROPIC_API_KEY}"
   },
   "mcpServers": {
