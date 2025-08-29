@@ -38,7 +38,8 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
             },
 
             async evaluate(messages: MessageParam[], prompt: string) {
-                const evalMessages = [{ role: "user" as const, content: prompt }];
+                // Use the provided messages as context, then add the evaluation prompt
+                const evalMessages = [...messages, { role: "user" as const, content: prompt }];
 
                 logger.llmRequest(provider, model, evalMessages, []);
 

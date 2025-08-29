@@ -177,36 +177,12 @@ export class MCPClient {
     }
 
     async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
-        const conversationSummary = this.getMessageSnapshot().map(msg => {
-            if (msg.role === "user") {
-                if (typeof msg.content === "string") {
-                    return `User: ${msg.content}`;
-                } else if (Array.isArray(msg.content)) {
-                    return `User: ${msg.content.map((c: any) =>
-                        c.type === "text" ? c.text :
-                            c.type === "tool_result" ? `[Tool Result: ${c.content}]` :
-                                "[Unknown Content]"
-                    ).join(" ")}`;
-                }
-            } else if (Array.isArray(msg.content)) {
-                return `Assistant: ${msg.content.map((c: any) =>
-                    c.type === "text" ? c.text :
-                        c.type === "tool_use" ? `[Used tool: ${c.name}]` :
-                            "[Unknown Content]"
-                ).join(" ")}`;
-            }
-            return "Unknown message";
-        }).join("\n");
-
-        const evaluationPrompt = `You are evaluating test assertions against a conversation history.
-
-CONVERSATION HISTORY:
-${conversationSummary}
+        const evaluationPrompt = `You are evaluating test assertions against the conversation history above.
 
 ASSERTION TO EVALUATE:
 ${assertion}
 
-Please evaluate whether this assertion is TRUE or FALSE based on the conversation history above. 
+Please evaluate whether this assertion is TRUE or FALSE based on the conversation history. 
 
 Respond in this exact JSON format:
 {
