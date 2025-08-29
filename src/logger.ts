@@ -1,4 +1,6 @@
-const isDebugEnabled = process.env.LOG_LEVEL === 'debug' || process.env.TRACE === 'true';
+function isDebugEnabled() {
+    return process.env.LOG_LEVEL === 'debug' || process.env.TRACE === 'true';
+}
 
 function timestamp() {
     return new Date().toISOString();
@@ -19,7 +21,7 @@ function summarizeTools(tools: any[]): string[] {
 export const logger = {
     // LLM domain methods
     llmRequest: (provider: string, model: string, messages: any[], tools: any[]) => {
-        if (!isDebugEnabled) return;
+        if (!isDebugEnabled()) return;
         console.debug(`[${timestamp()}] DEBUG: LLM Request [${provider}/${model}]`, {
             messageCount: messages.length,
             toolCount: tools.length,
@@ -29,7 +31,7 @@ export const logger = {
     },
 
     llmResponse: (provider: string, model: string, response: any) => {
-        if (!isDebugEnabled) return;
+        if (!isDebugEnabled()) return;
         console.debug(`[${timestamp()}] DEBUG: LLM Response [${provider}/${model}]`, {
             usage: response.usage,
             contentBlocks: response.content?.length || 0,
@@ -47,7 +49,7 @@ export const logger = {
 
     // MCP domain methods  
     mcpToolCall: (serverName: string, namespacedToolName: string, originalToolName: string, args: any) => {
-        if (!isDebugEnabled) return;
+        if (!isDebugEnabled()) return;
         console.debug(`[${timestamp()}] DEBUG: MCP Tool Call [${serverName}]`, {
             namespacedTool: namespacedToolName,
             originalTool: originalToolName,
@@ -57,7 +59,7 @@ export const logger = {
     },
 
     mcpToolResult: (serverName: string, namespacedToolName: string, originalToolName: string, result: any) => {
-        if (!isDebugEnabled) return;
+        if (!isDebugEnabled()) return;
         console.debug(`[${timestamp()}] DEBUG: MCP Tool Result [${serverName}]`, {
             namespacedTool: namespacedToolName,
             originalTool: originalToolName,
