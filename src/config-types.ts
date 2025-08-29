@@ -14,7 +14,6 @@
 
 
 export interface MCPConfig {
-    version: string;
     mcpClient: {
         provider: string;
         model: string;
@@ -32,7 +31,6 @@ export interface MCPConfig {
 }
 
 export interface ResolvedMCPConfig {
-    version: string;
     mcpClient: {
         provider: string;
         model: string;

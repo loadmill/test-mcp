@@ -52,7 +52,6 @@ export function loadMCPConfig(configPath: string = "mcp.config.json"): ResolvedM
 
     // Transform to resolved config format
     const resolvedConfig: ResolvedMCPConfig = {
-        version: resolved.version,
         mcpClient: {
             provider: resolved.mcpClient.provider,
             model: resolved.mcpClient.model,
