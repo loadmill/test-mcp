@@ -4,4 +4,4 @@ steps:
   - prompt: "Roll a dice for me"
   - prompt: "Flip a coin"
   - prompt: "Roll the dice again only if the first roll was higher than 3"
-  - assert: "Validate the that the dice was rolled only if the first roll was higher than 3"
+  - assert: "Validate the that the dice was rolled again only if the first roll was higher than 3"
