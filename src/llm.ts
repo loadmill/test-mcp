@@ -1,6 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import { MessageParam } from "@anthropic-ai/sdk/resources/messages/messages.mjs";
-import { logger } from "./logger.js";
+import { traceLLMRequest, traceLLMResponse, traceLLMError } from "./tracing.js";
 
 export interface LLM {
     generate(messages: MessageParam[], options?: { maxTokens?: number; tools?: any[] }): Promise<any>;
@@ -18,7 +18,7 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
             async generate(messages: MessageParam[], options = {}) {
                 const { maxTokens = 1000, tools = [] } = options;
 
-                logger.llmRequest(provider, model, messages, tools);
+                traceLLMRequest(provider, model, messages, tools);
 
                 try {
                     const response = await client.messages.create({
@@ -28,11 +28,11 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
                         tools,
                     });
 
-                    logger.llmResponse(provider, model, response);
+                    traceLLMResponse(provider, model, response);
 
                     return response;
                 } catch (error) {
-                    logger.llmError(provider, model, "generate", error);
+                    traceLLMError(provider, model, "generate", error);
                     throw error;
                 }
             },
@@ -41,7 +41,7 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
                 // Use the provided messages as context, then add the evaluation prompt
                 const evalMessages = [...messages, { role: "user" as const, content: prompt }];
 
-                logger.llmRequest(provider, model, evalMessages, []);
+                traceLLMRequest(provider, model, evalMessages, []);
 
                 try {
                     const response = await client.messages.create({
@@ -51,14 +51,14 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
                         tools: [],
                     });
 
-                    logger.llmResponse(provider, model, response);
+                    traceLLMResponse(provider, model, response);
 
                     return response.content
                         .filter(block => block.type === "text")
                         .map(block => block.text)
                         .join(" ");
                 } catch (error) {
-                    logger.llmError(provider, model, "evaluate", error);
+                    traceLLMError(provider, model, "evaluate", error);
                     throw error;
                 }
             }

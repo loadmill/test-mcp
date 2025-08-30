@@ -43,7 +43,7 @@ Tests are written in YAML format with `prompt` and `assert` steps. The test runn
 
 ## Debugging
 
-Enable trace mode for detailed request/response logging:
+Enable trace mode for detailed request/response logging to JSONL files:
 ```bash
 node build/index.js --trace
 ```

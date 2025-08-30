@@ -15,6 +15,9 @@ build/
 npm-debug.log*
 yarn-error.log*
 
+# trace files
+traces/
+
 # lockfiles
 yarn.lock
 pnpm-lock.yaml

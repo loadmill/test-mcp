@@ -2,7 +2,7 @@ import { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages/message
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { LLM } from "./llm.js";
-import { logger } from "./logger.js";
+import { traceMCPToolCall, traceMCPToolResult, traceMCPError } from "./tracing.js";
 
 // message history for the whole run
 const messages: MessageParam[] = [];
@@ -126,7 +126,7 @@ export class MCPClient {
                     throw new Error(`Server '${toolRegistration.serverName}' for tool '${name}' is not connected`);
                 }
 
-                logger.mcpToolCall(server.name, name, toolRegistration.originalToolName, args);
+                traceMCPToolCall(server.name, name, toolRegistration.originalToolName, args);
                 
                 let mcpResult;
                 try {
@@ -135,9 +135,9 @@ export class MCPClient {
                         name: toolRegistration.originalToolName, 
                         arguments: args 
                     });
-                    logger.mcpToolResult(server.name, name, toolRegistration.originalToolName, mcpResult);
+                    traceMCPToolResult(server.name, name, toolRegistration.originalToolName, mcpResult);
                 } catch (e) {
-                    logger.mcpError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
+                    traceMCPError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
                     throw e;
                 }
 

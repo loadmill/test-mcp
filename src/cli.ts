@@ -4,6 +4,7 @@ import { MCPClient, MCPClientOptions } from "./mcp-client.js";
 import { loadMCPConfig } from "./config-loader.js";
 import { TestRunner } from "./test-runner.js";
 import { createLLM } from "./llm.js";
+import { initializeTracing } from "./tracing.js";
 
 export async function chatLoop(mcpClient: MCPClient) {
     const rl = readline.createInterface({
@@ -73,6 +74,9 @@ export async function main() {
     if (traceMode) {
         process.env.TRACE = 'true';
     }
+    
+    // Initialize tracing after setting environment variables
+    initializeTracing();
 
     let mcpClient: MCPClient | null = null;
 
