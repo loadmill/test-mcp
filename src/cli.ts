@@ -34,7 +34,7 @@ export async function main() {
         boolean: ["interactive", "i", "help", "h", "trace"],
         string: ["config", "c", "tests-dir", "t"],
         default: {
-            config: "mcp.config.json",
+            config: "test-mcp.config.json",
             "tests-dir": "tests"
         },
         alias: {
@@ -52,7 +52,7 @@ export async function main() {
         console.log("");
         console.log("Options:");
         console.log("  -i, --interactive     Run in interactive chat mode");
-        console.log("  -c, --config <file>   Config file path (default: mcp.config.json)");
+        console.log("  -c, --config <file>   Config file path (default: test-mcp.config.json)");
         console.log("  -t, --tests-dir <dir> Tests directory (default: tests)");
         console.log("      --trace           Enable detailed request/response tracing");
         console.log("  -h, --help            Show help");
