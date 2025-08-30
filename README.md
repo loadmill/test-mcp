@@ -24,6 +24,8 @@
 **`test-mcp`** is the first headless [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) client for automated testing.  
 If you’re building an MCP server, test-mcp helps you validate it end-to-end in a fast and repeatable way.
 
+https://github.com/user-attachments/assets/c4e5295b-7217-47f2-96d9-76befcea8b21
+
 ---
 
 <h2 id="whats-test-mcp">💡 What's `test-mcp`?</h2>
