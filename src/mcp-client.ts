@@ -260,6 +260,11 @@ export class MCPClient {
         return [...messages];
     }
 
+    clearConversationHistory(): void {
+        messages.length = 0;
+        this.allToolExecutions.length = 0;
+    }
+
     async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
         const toolExecutionLog = this.allToolExecutions.length > 0 
             ? this.allToolExecutions.map(e => `- ${e.serverName}/${e.originalToolName}${e.result ? ` -> ${e.result}` : ''}`).join('\n')

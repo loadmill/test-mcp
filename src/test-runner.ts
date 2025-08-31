@@ -36,6 +36,9 @@ export class TestRunner {
         const startTime = Date.now();
         const testFile = await this.loadTestFile(filePath);
 
+        // Clear conversation history before each test
+        this.mcpClient.clearConversationHistory();
+
         console.log(`\n📋 Running test: ${testFile.description}`);
         console.log(`📁 File: ${filePath}`);
         console.log(`🔢 Steps: ${testFile.steps.length}`);
