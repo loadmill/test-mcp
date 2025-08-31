@@ -179,3 +179,9 @@ test-mcp -i
 <h2 id="contributing">🤝 Contributing</h2>
 
 Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](./.github/CONTRIBUTING.md).
+
+---
+
+<h2 id="license">📄 License</h2>
+
+Apache License 2.0 © [Loadmill](LICENSE)
