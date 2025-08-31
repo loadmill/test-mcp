@@ -53,17 +53,24 @@ export class TestRunner {
                 console.log(`\n💬 Step ${i + 1}: ${step.prompt}`);
 
                 try {
-                    const response = await this.mcpClient.processQuery(step.prompt);
+                    const queryResult = await this.mcpClient.processQueryWithDetails(step.prompt);
                     const stepDuration = Date.now() - stepStartTime;
 
+                    // Display any tool executions
+                    if (queryResult.toolExecutions.length > 0) {
+                        for (const execution of queryResult.toolExecutions) {
+                            console.log(`🔧 Tool: ${execution.serverName}/${execution.originalToolName}`);
+                        }
+                    }
+
                     console.log(`✅ Response (${stepDuration}ms):`);
-                    console.log(response);
+                    console.log(queryResult.response);
 
                     stepResults.push({
                         stepIndex: i,
                         stepType: "prompt",
                         input: step.prompt,
-                        response,
+                        response: queryResult.response,
                         success: true,
                         duration: stepDuration
                     });
