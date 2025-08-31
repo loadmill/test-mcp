@@ -36,14 +36,14 @@ export const traceLLMRequest = (provider: string, model: string, messages: any[]
         category: 'llm_request',
         provider,
         model,
-        messageCount: messages.length,
-        toolCount: tools.length,
-        messages: messages.map(msg => ({
-            role: msg.role,
-            contentType: typeof msg.content,
-            contentLength: typeof msg.content === 'string' ? msg.content.length : JSON.stringify(msg.content).length
+        messageCount: messages?.length || 0,
+        toolCount: tools?.length || 0,
+        messages: (messages || []).map(msg => ({
+            role: msg?.role,
+            contentType: typeof msg?.content,
+            contentLength: typeof msg?.content === 'string' ? msg.content.length : JSON.stringify(msg?.content || {}).length
         })),
-        tools: tools.map(t => t.name || t.toString())
+        tools: (tools || []).map(t => t?.name || t?.toString() || 'unknown')
     }, 'LLM Request');
 };
 

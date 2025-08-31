@@ -8,7 +8,7 @@ function randomNumber() {
 
 const server = new McpServer({
   name: "random-server",
-  version: "0.0.1",
+  version: "0.0.",
 });
 
 server.tool(

@@ -1,0 +1,17 @@
+{
+  "mcpClient": {
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "api_key_env": "${env:OPENAI_API_KEY}"
+  },
+  "mcpServers": {
+    "dice": {
+      "command": "node",
+      "args": ["examples/dice-mcp-server.js"]
+    },
+    "coin": {
+      "command": "node", 
+      "args": ["examples/coin-mcp-server.js"]
+    }
+  }
+}

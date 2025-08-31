@@ -3,7 +3,7 @@ import minimist from "minimist";
 import { MCPClient, MCPClientOptions } from "./mcp-client.js";
 import { loadMCPConfig } from "./config-loader.js";
 import { TestRunner } from "./test-runner.js";
-import { createLLM } from "./llm.js";
+import { createLLM } from "./llm/index.js";
 import { initializeTracing } from "./tracing.js";
 
 export async function chatLoop(mcpClient: MCPClient) {
@@ -94,6 +94,8 @@ export async function main() {
         mcpClient = new MCPClient(llm, clientOptions);
 
         await mcpClient.connectToServers(config.mcpServers);
+        
+        console.log(`🤖 Using: ${config.mcpClient.provider}/${config.mcpClient.model}`);
 
         if (interactiveMode) {
             console.log("💬 Running in interactive mode");

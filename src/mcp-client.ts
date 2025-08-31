@@ -1,11 +1,10 @@
-import { MessageParam, Tool } from "@anthropic-ai/sdk/resources/messages/messages.mjs";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { LLM } from "./llm.js";
+import { LLM, Message, Tool, ToolResult } from "./llm/index.js";
 import { traceMCPToolCall, traceMCPToolResult, traceMCPError } from "./tracing.js";
 
-// message history for the whole run
-const messages: MessageParam[] = [];
+// message history for the whole run - now using canonical format
+const messages: Message[] = [];
 
 export interface MCPClientOptions {
     maxTokens: number;
@@ -38,6 +37,7 @@ export class MCPClient {
     private tools: Tool[] = [];
     private toolRegistry: Map<string, ToolRegistration> = new Map(); // namespacedToolName -> {serverName, originalToolName}
     private options: MCPClientOptions;
+    
     constructor(llm: LLM, options: MCPClientOptions) {
         this.llm = llm;
         this.options = options;
@@ -58,12 +58,12 @@ export class MCPClient {
             await client.connect(transport);
 
             const toolsResult = await client.listTools();
-            const serverTools = toolsResult.tools.map(tool => {
+            const serverTools: Tool[] = toolsResult.tools.map(tool => {
                 const namespacedName = `${serverName}_${tool.name}`;
                 return {
                     name: namespacedName, // Use namespaced name for LLM
-                    description: tool.description,
-                    input_schema: tool.inputSchema,
+                    description: tool.description || `Tool: ${tool.name}`,
+                    inputSchema: tool.inputSchema,
                 };
             });
 
@@ -97,8 +97,8 @@ export class MCPClient {
         console.log("All servers connected. Total tools:", this.tools.map(t => t.name));
     }
 
-    async processQuery(query: string) {
-        // const messages: MessageParam[] = [{ role: "user", content: query }];
+    async processQuery(query: string): Promise<string> {
+        // Add user message to conversation history
         messages.push({ role: "user", content: query });
 
         let response = await this.llm.generate(messages, {
@@ -106,14 +106,19 @@ export class MCPClient {
             tools: this.tools
         });
 
-        messages.push({ role: "assistant", content: response.content });
+        // Process any tool calls
+        if (response.toolCalls.length > 0) {
+            // Add assistant message with tool calls to history
+            messages.push({ 
+                role: "assistant", 
+                content: response.toolCalls 
+            });
 
-        const toolResults: { type: "tool_result"; tool_use_id: string; content: string }[] = [];
+            const toolResults: ToolResult[] = [];
 
-        for (const block of response.content) {
-            if (block.type === "tool_use") {
-                const name = block.name;
-                const args = (block.input as Record<string, unknown>) ?? {};
+            for (const toolCall of response.toolCalls) {
+                const name = toolCall.name;
+                const args = toolCall.args;
 
                 // Look up which server has this namespaced tool
                 const toolRegistration = this.toolRegistry.get(name);
@@ -138,9 +143,17 @@ export class MCPClient {
                     traceMCPToolResult(server.name, name, toolRegistration.originalToolName, mcpResult);
                 } catch (e) {
                     traceMCPError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
-                    throw e;
+                    
+                    // Add error result
+                    toolResults.push({
+                        toolCallId: toolCall.id,
+                        content: `Error calling tool: ${e instanceof Error ? e.message : String(e)}`,
+                        isError: true
+                    });
+                    continue;
                 }
 
+                // Convert MCP result to text
                 const textOut = Array.isArray(mcpResult.content)
                     ? mcpResult.content
                         .map((c: any) => (c?.type === "text" ? c.text : typeof c === "string" ? c : ""))
@@ -149,30 +162,34 @@ export class MCPClient {
                     : JSON.stringify(mcpResult);
 
                 toolResults.push({
-                    type: "tool_result",
-                    tool_use_id: block.id,
+                    toolCallId: toolCall.id,
                     content: textOut || JSON.stringify(mcpResult),
+                    isError: false
                 });
             }
-        }
 
-        if (toolResults.length > 0) {
+            // Add tool results to message history
             messages.push({ role: "user", content: toolResults });
 
+            // Get final response from LLM
             response = await this.llm.generate(messages, {
                 maxTokens: this.options.maxTokens,
                 tools: this.tools
             });
-
-            messages.push({ role: "assistant", content: response.content });
         }
 
-        const out: string[] = [];
-        for (const b of response.content) {if (b.type === "text") {out.push(b.text);}}
-        return out.join("\n").trim();
+        // Add final assistant response to history
+        if (response.textContent || response.toolCalls.length === 0) {
+            messages.push({ 
+                role: "assistant", 
+                content: response.textContent 
+            });
+        }
+
+        return response.textContent;
     }
 
-    getMessageSnapshot(): MessageParam[] {
+    getMessageSnapshot(): Message[] {
         return [...messages];
     }
 
