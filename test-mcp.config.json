@@ -1,8 +1,8 @@
 {
   "mcpClient": {
-    "provider": "anthropic",
-    "model": "claude-3-5-haiku-latest",
-    "api_key_env": "${env:ANTHROPIC_API_KEY}"
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "api_key_env": "${env:OPENAI_API_KEY}"
   },
   "mcpServers": {
     "dice": {
