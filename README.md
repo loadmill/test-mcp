@@ -60,6 +60,9 @@ When running from source:
 git clone https://github.com/loadmill/test-mcp
 cd test-mcp
 npm install
+# For OpenAI (default example)
+echo "OPENAI_API_KEY=your_api_key_here" > .env
+# Or for Anthropic
 echo "ANTHROPIC_API_KEY=your_api_key_here" > .env
 npm run build
 ```
