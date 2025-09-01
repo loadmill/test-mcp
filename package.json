@@ -9,7 +9,8 @@
     "build/**/*",
     "bin/**/*",
     "README.md",
-    "mcp.config.json"
+    "LICENSE",
+    "test-mcp.config.json"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -27,8 +28,8 @@
     "agent",
     "cli"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "idoco",
+  "license": "Apache-2.0",
   "type": "module",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.36.3",
@@ -48,6 +49,6 @@
     "typescript": "^5.7.3"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.17.0"
   }
 }
