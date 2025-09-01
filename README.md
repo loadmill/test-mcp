@@ -39,7 +39,7 @@ https://github.com/user-attachments/assets/c4e5295b-7217-47f2-96d9-76befcea8b21
 Together, these let you automate and validate MCP server behavior with simple, repeatable tests.
 
 **Supported Transports & Providers:**
-- **MCP Servers**: stdio (local) and HTTP (remote)
+- **MCP Servers**: STDIO (local) and HTTP (remote)
 - **LLM Providers**: Anthropic Claude and OpenAI GPT models
 
 ---
