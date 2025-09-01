@@ -32,11 +32,15 @@ https://github.com/user-attachments/assets/c4e5295b-7217-47f2-96d9-76befcea8b21
 
 `test-mcp` gives you three core components:
 
-* **Configuration** – define your MCP servers and LLM provider (currently Anthropic and OpenAI) in a single JSON file.
+* **Configuration** – define your MCP servers and LLM provider in a single JSON file.
 * **Test Files** – write flows of natural-language prompts and assertions in YAML.
 * **Runner** – run tests from the CLI, get clear pass/fail results.
 
 Together, these let you automate and validate MCP server behavior with simple, repeatable tests.
+
+**Supported Transports & Providers:**
+- **MCP Servers**: stdio (local) and HTTP (remote)
+- **LLM Providers**: Anthropic Claude and OpenAI GPT models
 
 ---
 
@@ -88,6 +92,7 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
   },
   "mcpServers": {
     "loadmill": {
+      "type": "stdio",
       "command": "npx",
       "args": ["@loadmill/mcp"],
       "env": {
@@ -172,7 +177,7 @@ test-mcp -i
 * [x] Support for `stdio` transport
 * [x] Evaluator for natural-language assertions
 * [x] OpenAI support
-* [ ] Support for `http` transport
+* [x] Support for `http` transport
 * [ ] CI-friendly reports
 * [ ] Subfolder/glob test discovery
 

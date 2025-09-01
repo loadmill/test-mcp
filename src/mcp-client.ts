@@ -1,7 +1,9 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { LLM, Message, Tool, ToolCall, ToolResult, Response } from "./llm/index.js";
 import { traceMCPToolCall, traceMCPToolResult, traceMCPError } from "./tracing.js";
+import { ResolvedMCPConfig } from "./config-types.js";
 
 // message history for the whole run - now using canonical format
 const messages: Message[] = [];
@@ -14,17 +16,12 @@ export interface MCPClientOptions {
 
 interface ServerConnection {
     client: Client;
-    transport: StdioClientTransport;
+    transport: StdioClientTransport | StreamableHTTPClientTransport;
     name: string;
+    type: "stdio" | "http";
 }
 
-interface ServerConfig {
-    command: string;
-    args: string[];
-    env?: {
-        [key: string]: string;
-    };
-}
+type ServerConfig = ResolvedMCPConfig["mcpServers"][string];
 
 interface ToolRegistration {
     serverName: string;
@@ -58,13 +55,13 @@ export class MCPClient {
 
     async connectToServer(serverName: string, config: ServerConfig) {
         try {
-            const { client, transport } = await this.setupServerConnection(serverName, config);
+            const { client, transport, type } = await this.setupServerConnection(serverName, config);
             const serverTools = await this.registerServerTools(serverName, client);
             
-            this.servers.push({ client, transport, name: serverName });
+            this.servers.push({ client, transport, name: serverName, type });
             this.tools.push(...serverTools);
             
-            console.log(`Connected to server '${serverName}' with tools:`, serverTools.map(t => t.name));
+            console.log(`Connected to server '${serverName}' (${type}) with tools:`, serverTools.map(t => t.name));
         } catch (e) {
             console.error(`Failed to connect to MCP server '${serverName}':`, e);
             throw e;
@@ -72,11 +69,31 @@ export class MCPClient {
     }
 
     private async setupServerConnection(serverName: string, config: ServerConfig) {
-        const transport = new StdioClientTransport({
-            command: config.command,
-            args: config.args,
-            env: config.env
-        });
+        let transport: StdioClientTransport | StreamableHTTPClientTransport;
+        let transportType: "stdio" | "http";
+        
+        if (config.type === "stdio") {
+            transport = new StdioClientTransport({
+                command: config.command,
+                args: config.args,
+                env: config.env
+            });
+            transportType = "stdio";
+        } else if (config.type === "http") {
+            const url = new URL(config.url);
+            const requestInit: RequestInit = {};
+            
+            if (config.headers) {
+                requestInit.headers = config.headers;
+            }
+            
+            transport = new StreamableHTTPClientTransport(url, {
+                requestInit
+            });
+            transportType = "http";
+        } else {
+            throw new Error(`Unknown transport type for server '${serverName}': ${(config as any).type || "missing type field"}`);
+        }
         
         const client = new Client({
             name: `${this.options.clientName}-${serverName}`,
@@ -85,7 +102,7 @@ export class MCPClient {
 
         await client.connect(transport);
         
-        return { client, transport };
+        return { client, transport, type: transportType };
     }
 
     private async registerServerTools(serverName: string, client: Client): Promise<Tool[]> {
@@ -202,7 +219,7 @@ export class MCPClient {
             originalToolName: toolRegistration.originalToolName
         };
 
-        traceMCPToolCall(server.name, name, toolRegistration.originalToolName, args);
+        traceMCPToolCall(server.name, name, toolRegistration.originalToolName, args, server.type);
         
         try {
             // Call the tool using its original name on the server
@@ -211,7 +228,7 @@ export class MCPClient {
                 arguments: args 
             });
             
-            traceMCPToolResult(server.name, name, toolRegistration.originalToolName, mcpResult);
+            traceMCPToolResult(server.name, name, toolRegistration.originalToolName, mcpResult, server.type);
 
             // Convert MCP result to text
             const textOut = Array.isArray(mcpResult.content)

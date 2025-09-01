@@ -70,23 +70,25 @@ export const traceLLMError = (provider: string, model: string, operation: string
     }, `LLM ${operation} failed`);
 };
 
-export const traceMCPToolCall = (serverName: string, namespacedToolName: string, originalToolName: string, args: any) => {
+export const traceMCPToolCall = (serverName: string, namespacedToolName: string, originalToolName: string, args: any, transport?: string) => {
     logger.debug({
         category: 'mcp_tool_call',
         server: serverName,
         namespacedTool: namespacedToolName,
         originalTool: originalToolName,
+        transport: transport || 'unknown',
         argCount: Object.keys(args || {}).length,
         args
     }, 'MCP Tool Call');
 };
 
-export const traceMCPToolResult = (serverName: string, namespacedToolName: string, originalToolName: string, result: any) => {
+export const traceMCPToolResult = (serverName: string, namespacedToolName: string, originalToolName: string, result: any, transport?: string) => {
     logger.debug({
         category: 'mcp_tool_result',
         server: serverName,
         namespacedTool: namespacedToolName,
         originalTool: originalToolName,
+        transport: transport || 'unknown',
         isError: result.isError || false,
         contentLength: JSON.stringify(result).length,
         hasContent: !!result.content

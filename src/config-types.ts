@@ -13,6 +13,23 @@
  */
 
 
+interface StdioServerConfig {
+    type: "stdio";
+    command: string;
+    args: string[];
+    env?: {
+        [key: string]: string;
+    };
+}
+
+interface HttpServerConfig {
+    type: "http";
+    url: string;
+    headers?: {
+        [key: string]: string;
+    };
+}
+
 export interface MCPConfig {
     mcpClient: {
         provider: string;
@@ -20,13 +37,24 @@ export interface MCPConfig {
         api_key: string;
     };
     mcpServers: {
-        [name: string]: {
-            command: string;
-            args: string[];
-            env?: {
-                [key: string]: string;
-            };
-        };
+        [name: string]: StdioServerConfig | HttpServerConfig;
+    };
+}
+
+interface ResolvedStdioServerConfig {
+    type: "stdio";
+    command: string;
+    args: string[];
+    env?: {
+        [key: string]: string;
+    };
+}
+
+interface ResolvedHttpServerConfig {
+    type: "http";
+    url: string;
+    headers?: {
+        [key: string]: string;
     };
 }
 
@@ -37,12 +65,6 @@ export interface ResolvedMCPConfig {
         apiKey: string;
     };
     mcpServers: {
-        [name: string]: {
-            command: string;
-            args: string[];
-            env?: {
-                [key: string]: string;
-            };
-        };
+        [name: string]: ResolvedStdioServerConfig | ResolvedHttpServerConfig;
     };
 }
