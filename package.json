@@ -1,9 +1,10 @@
 {
   "name": "@loadmill/mcp-test",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "description": "Headless MCP client for automated testing",
   "main": "build/index.js",
   "bin": {
-    "test-mcp": "./bin/test-mcp"
+    "test-mcp": "bin/test-mcp"
   },
   "files": [
     "build/**/*",
@@ -14,9 +15,19 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "build": "tsc",
+    "start": "node build/index.js",
+    "clean": "rm -rf build",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
+  },
+  "homepage": "https://github.com/loadmill/test-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loadmill/test-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/loadmill/test-mcp/issues"
   },
   "keywords": [
     "mcp",
