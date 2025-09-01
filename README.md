@@ -149,6 +149,7 @@ Options:
   -c, --config <file>   Path to config file (default: mcp.config.json)
   -t, --tests-dir <dir> Directory containing test files (default: tests)
   -i, --interactive     Run in interactive chat mode
+      --trace           Enable detailed tracing output
   -h, --help            Show help
 ```
 
