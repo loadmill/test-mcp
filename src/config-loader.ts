@@ -55,7 +55,7 @@ export function loadMCPConfig(configPath: string = "mcp.config.json"): ResolvedM
         mcpClient: {
             provider: resolved.mcpClient.provider,
             model: resolved.mcpClient.model,
-            apiKey: resolved.mcpClient.api_key_env,
+            apiKey: resolved.mcpClient.api_key,
         },
         mcpServers: resolved.mcpServers,
     };

@@ -17,7 +17,7 @@ export interface MCPConfig {
     mcpClient: {
         provider: string;
         model: string;
-        api_key_env: string;
+        api_key: string;
     };
     mcpServers: {
         [name: string]: {

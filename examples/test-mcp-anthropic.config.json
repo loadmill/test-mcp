@@ -2,7 +2,7 @@
   "mcpClient": {
     "provider": "anthropic",
     "model": "claude-3-5-haiku-latest",
-    "api_key_env": "${env:ANTHROPIC_API_KEY}"
+    "api_key": "${env:ANTHROPIC_API_KEY}"
   },
   "mcpServers": {
     "dice": {

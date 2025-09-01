@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/c4e5295b-7217-47f2-96d9-76befcea8b21
 
 `test-mcp` gives you three core components:
 
-* **Configuration** – define your MCP servers and LLM provider in a single JSON file.
+* **Configuration** – define your MCP servers and LLM provider (currently Anthropic and OpenAI) in a single JSON file.
 * **Test Files** – write flows of natural-language prompts and assertions in YAML.
 * **Runner** – run tests from the CLI, get clear pass/fail results.
 
@@ -84,7 +84,7 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
   "mcpClient": {
     "provider": "anthropic",
     "model": "claude-3-7-sonnet-latest",
-    "api_key_env": "${env:ANTHROPIC_API_KEY}"
+    "api_key": "${env:ANTHROPIC_API_KEY}"
   },
   "mcpServers": {
     "loadmill": {
@@ -97,6 +97,8 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
   }
 }
 ```
+
+OpenAI is also supported - see configuration variations in the `examples/` folder.
 
 **2) Example test (`tests/bank-transaction.test.yaml`)**
 
@@ -169,8 +171,8 @@ test-mcp -i
 * [x] Headless MCP client with Anthropic support
 * [x] Support for `stdio` transport
 * [x] Evaluator for natural-language assertions
+* [x] OpenAI support
 * [ ] Support for `http` transport
-* [ ] OpenAI support
 * [ ] CI-friendly reports
 * [ ] Subfolder/glob test discovery
 
