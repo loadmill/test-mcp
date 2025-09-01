@@ -75,7 +75,7 @@ To try `test-mcp` quickly with the included examples:
 node build/index.js
 ```
 
-Example MCP servers are available in the `examples/` folder and a sample `mcp.config.json` is provided in the repo.
+This will run a demonstration that shows both local STDIO and remote HTTP MCP servers working together. The test rolls a local dice server and queries a remote MCP server registry.
 
 ---
 
@@ -86,9 +86,9 @@ Example MCP servers are available in the `examples/` folder and a sample `mcp.co
 ```json
 {
   "mcpClient": {
-    "provider": "anthropic",
-    "model": "claude-3-7-sonnet-latest",
-    "api_key": "${env:ANTHROPIC_API_KEY}"
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "api_key": "${env:OPENAI_API_KEY}"
   },
   "mcpServers": {
     "loadmill": {

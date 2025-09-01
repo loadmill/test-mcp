@@ -10,10 +10,9 @@
       "command": "node",
       "args": ["examples/dice-mcp-server.js"]
     },
-    "coin": {
-      "type": "stdio",
-      "command": "node", 
-      "args": ["examples/coin-mcp-server.js"]
+    "remoteMCP": {
+      "type": "http",
+      "url": "https://mcp.remote-mcp.com"
     }
   }
 }

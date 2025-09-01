@@ -1,7 +1,0 @@
-description: "Simple dice and coin game test"
-
-steps:
-  - prompt: "Roll a dice for me"
-  - prompt: "Flip a coin"
-  - prompt: "Roll the dice again only if the first roll was higher than 3"
-  - assert: "A second dice roll occurs if and only if first roll > 3"

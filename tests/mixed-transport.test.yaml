@@ -1,0 +1,6 @@
+description: "Dice roll with remote MCP server integration test"
+
+steps:
+  - prompt: "Roll a dice for me"
+  - prompt: "Use the remote MCP server to list available remote servers, and tell me how many there are"
+  - assert: "Both the dice roll and the remote server listing were executed successfully"
