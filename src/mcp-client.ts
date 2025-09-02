@@ -307,7 +307,9 @@ Respond in this exact JSON format:
 {
 "passed": true/false,
 "reasoning": "Brief explanation focusing on actual tool executions and objective evidence"
-}`;
+}
+
+IMPORTANT: In the reasoning field, use only plain text. Do not include any JSON, code, or special characters that could break JSON parsing. Use simple descriptive language only.`;
 
         try {
             const responseText = await this.llm.evaluate(this.getMessageSnapshot(), evaluationPrompt);
