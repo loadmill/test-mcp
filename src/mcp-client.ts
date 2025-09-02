@@ -47,7 +47,7 @@ export class MCPClient {
     private toolRegistry: Map<string, ToolRegistration> = new Map(); // namespacedToolName -> {serverName, originalToolName}
     private options: MCPClientOptions;
     private allToolExecutions: ToolExecution[] = []; // Track all tool executions for the session
-    
+
     constructor(llm: LLM, options: MCPClientOptions) {
         this.llm = llm;
         this.options = options;
@@ -57,10 +57,10 @@ export class MCPClient {
         try {
             const { client, transport, type } = await this.setupServerConnection(serverName, config);
             const serverTools = await this.registerServerTools(serverName, client);
-            
+
             this.servers.push({ client, transport, name: serverName, type });
             this.tools.push(...serverTools);
-            
+
             console.log(`Connected to server '${serverName}' (${type}) with tools:`, serverTools.map(t => t.name));
         } catch (e) {
             console.error(`Failed to connect to MCP server '${serverName}':`, e);
@@ -71,7 +71,7 @@ export class MCPClient {
     private async setupServerConnection(serverName: string, config: ServerConfig) {
         let transport: StdioClientTransport | StreamableHTTPClientTransport;
         let transportType: "stdio" | "http";
-        
+
         if (config.type === "stdio") {
             transport = new StdioClientTransport({
                 command: config.command,
@@ -82,11 +82,11 @@ export class MCPClient {
         } else if (config.type === "http") {
             const url = new URL(config.url);
             const requestInit: RequestInit = {};
-            
+
             if (config.headers) {
                 requestInit.headers = config.headers;
             }
-            
+
             transport = new StreamableHTTPClientTransport(url, {
                 requestInit
             });
@@ -94,20 +94,20 @@ export class MCPClient {
         } else {
             throw new Error(`Unknown transport type for server '${serverName}': ${(config as any).type || "missing type field"}`);
         }
-        
+
         const client = new Client({
             name: `${this.options.clientName}-${serverName}`,
             version: this.options.clientVersion
         });
 
         await client.connect(transport);
-        
+
         return { client, transport, type: transportType };
     }
 
     private async registerServerTools(serverName: string, client: Client): Promise<Tool[]> {
         const toolsResult = await client.listTools();
-        
+
         const serverTools: Tool[] = toolsResult.tools.map(tool => {
             const namespacedName = `${serverName}_${tool.name}`;
             return {
@@ -143,7 +143,7 @@ export class MCPClient {
 
     async processQueryWithDetails(query: string): Promise<QueryResult> {
         const toolExecutions: ToolExecution[] = [];
-        
+
         // Add user message to conversation history
         messages.push({ role: "user", content: query });
 
@@ -160,9 +160,9 @@ export class MCPClient {
 
         // Add final assistant response to history
         if (response.textContent || response.toolCalls.length === 0) {
-            messages.push({ 
-                role: "assistant", 
-                content: response.textContent 
+            messages.push({
+                role: "assistant",
+                content: response.textContent
             });
         }
 
@@ -174,9 +174,9 @@ export class MCPClient {
 
     private async executeToolCalls(toolCalls: ToolCall[], toolExecutions?: ToolExecution[]): Promise<ToolResult[]> {
         // Add assistant message with tool calls to history
-        messages.push({ 
-            role: "assistant", 
-            content: toolCalls 
+        messages.push({
+            role: "assistant",
+            content: toolCalls
         });
 
         const toolResults: ToolResult[] = [];
@@ -184,7 +184,7 @@ export class MCPClient {
         for (const toolCall of toolCalls) {
             const { result, execution } = await this.executeSingleTool(toolCall);
             toolResults.push(result);
-            
+
             if (toolExecutions && execution) {
                 toolExecutions.push(execution);
             }
@@ -220,14 +220,14 @@ export class MCPClient {
         };
 
         traceMCPToolCall(server.name, name, toolRegistration.originalToolName, args, server.type);
-        
+
         try {
             // Call the tool using its original name on the server
-            const mcpResult = await server.client.callTool({ 
-                name: toolRegistration.originalToolName, 
-                arguments: args 
+            const mcpResult = await server.client.callTool({
+                name: toolRegistration.originalToolName,
+                arguments: args
             });
-            
+
             traceMCPToolResult(server.name, name, toolRegistration.originalToolName, mcpResult, server.type);
 
             // Convert MCP result to text
@@ -251,10 +251,10 @@ export class MCPClient {
             };
         } catch (e) {
             traceMCPError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
-            
+
             const errorMsg = `Error calling tool: ${e instanceof Error ? e.message : String(e)}`;
             execution.result = errorMsg;
-            
+
             return {
                 result: {
                     toolCallId: id,
@@ -283,9 +283,9 @@ export class MCPClient {
     }
 
     async evaluateAssertion(assertion: string): Promise<{ passed: boolean; reasoning: string }> {
-        const toolExecutionLog = this.allToolExecutions.length > 0 
-            ? this.allToolExecutions.map(e => `- ${e.serverName}/${e.originalToolName}${e.result ? ` -> ${e.result}` : ''}`).join('\n')
-            : '(No tools were executed)';
+        const toolExecutionLog = this.allToolExecutions.length > 0
+            ? this.allToolExecutions.map(e => `- ${e.serverName}/${e.originalToolName}${e.result ? ` -> ${e.result}` : ""}`).join("\n")
+            : "(No tools were executed)";
 
         const evaluationPrompt = `You are evaluating test assertions against both the conversation history and the objective tool execution log.
 

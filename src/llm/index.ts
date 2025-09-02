@@ -15,13 +15,13 @@ export function createLLM(config: { provider: string; model: string; apiKey: str
     }
 
     switch (provider.toLowerCase()) {
-        case "anthropic":
-            return new AnthropicAdapter(new Anthropic({ apiKey }), model);
-            
-        case "openai":
-            return new OpenAIAdapter(new OpenAI({ apiKey }), model);
+    case "anthropic":
+        return new AnthropicAdapter(new Anthropic({ apiKey }), model);
 
-        default:
-            throw new Error(`Unsupported LLM provider: ${provider}. Supported providers: anthropic, openai`);
+    case "openai":
+        return new OpenAIAdapter(new OpenAI({ apiKey }), model);
+
+    default:
+        throw new Error(`Unsupported LLM provider: ${provider}. Supported providers: anthropic, openai`);
     }
 }

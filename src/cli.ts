@@ -70,11 +70,11 @@ export async function main() {
     const configPath = args.config;
     const testsDir = args["tests-dir"];
     const traceMode = args.trace;
-    
+
     if (traceMode) {
-        process.env.TRACE = 'true';
+        process.env.TRACE = "true";
     }
-    
+
     // Initialize tracing after setting environment variables
     initializeTracing();
 
@@ -94,7 +94,7 @@ export async function main() {
         mcpClient = new MCPClient(llm, clientOptions);
 
         await mcpClient.connectToServers(config.mcpServers);
-        
+
         console.log(`🤖 Using: ${config.mcpClient.provider}/${config.mcpClient.model}`);
 
         if (interactiveMode) {

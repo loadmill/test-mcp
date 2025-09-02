@@ -1,7 +1,7 @@
 // Canonical LLM types - provider-neutral abstractions
 
 export interface Message {
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string | ToolCall[] | ToolResult[];
 }
 
@@ -26,7 +26,7 @@ export interface Tool {
 export interface Response {
     textContent: string;
     toolCalls: ToolCall[];
-    stopReason: 'stop' | 'tool_calls' | 'max_tokens' | 'other';
+    stopReason: "stop" | "tool_calls" | "max_tokens" | "other";
 }
 
 export interface LLMOptions {

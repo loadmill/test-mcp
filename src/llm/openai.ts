@@ -6,22 +6,22 @@ export class OpenAIAdapter implements LLM {
     constructor(private client: OpenAI, private model: string) {}
 
     private convertToOpenAIMessages(messages: Message[]): any[] {
-        if (!messages) return [];
-        
+        if (!messages) {return [];}
+
         return messages.map(msg => {
-            if (typeof msg.content === 'string') {
+            if (typeof msg.content === "string") {
                 return { role: msg.role, content: msg.content };
             }
-            
+
             if (Array.isArray(msg.content)) {
                 // Handle tool calls (assistant messages)
-                if (msg.content.length > 0 && 'name' in msg.content[0]) {
+                if (msg.content.length > 0 && "name" in msg.content[0]) {
                     const toolCalls = msg.content as ToolCall[];
                     return {
-                        role: 'assistant',
+                        role: "assistant",
                         tool_calls: toolCalls.map(tc => ({
                             id: tc.id,
-                            type: 'function',
+                            type: "function",
                             function: {
                                 name: tc.name,
                                 arguments: JSON.stringify(tc.args)
@@ -29,25 +29,25 @@ export class OpenAIAdapter implements LLM {
                         }))
                     };
                 }
-                
+
                 // Handle tool results (convert to multiple tool messages)
                 const toolResults = msg.content as ToolResult[];
                 return toolResults.map(tr => ({
-                    role: 'tool',
+                    role: "tool",
                     tool_call_id: tr.toolCallId,
                     content: tr.content
                 }));
             }
-            
+
             return { role: msg.role, content: String(msg.content) };
-        }).flat().filter(msg => msg != null); // Flatten and remove any null/undefined values
+        }).flat().filter(msg => msg !== null); // Flatten and remove any null/undefined values
     }
 
     private convertToOpenAITools(tools: Tool[]): any[] {
-        if (!tools) return [];
-        
+        if (!tools) {return [];}
+
         return tools.map(tool => ({
-            type: 'function',
+            type: "function",
             function: {
                 name: tool.name,
                 description: tool.description,
@@ -59,25 +59,25 @@ export class OpenAIAdapter implements LLM {
     private convertFromOpenAIResponse(response: any): Response {
         const choice = response.choices[0];
         const message = choice.message;
-        
-        let textContent = message.content || '';
+
+        const textContent = message.content || "";
         const toolCalls: ToolCall[] = [];
 
         if (message.tool_calls) {
             for (const toolCall of message.tool_calls) {
-                if (toolCall.type === 'function') {
+                if (toolCall.type === "function") {
                     toolCalls.push({
                         id: toolCall.id,
                         name: toolCall.function.name,
-                        args: JSON.parse(toolCall.function.arguments || '{}')
+                        args: JSON.parse(toolCall.function.arguments || "{}")
                     });
                 }
             }
         }
 
-        const stopReason = choice.finish_reason === 'tool_calls' ? 'tool_calls' :
-                          choice.finish_reason === 'length' ? 'max_tokens' :
-                          choice.finish_reason === 'stop' ? 'stop' : 'other';
+        const stopReason = choice.finish_reason === "tool_calls" ? "tool_calls" :
+            choice.finish_reason === "length" ? "max_tokens" :
+                choice.finish_reason === "stop" ? "stop" : "other";
 
         return {
             textContent: textContent.trim(),
@@ -88,11 +88,11 @@ export class OpenAIAdapter implements LLM {
 
     async generate(messages: Message[], options: LLMOptions = {}): Promise<Response> {
         const { maxTokens = 1000, tools = [] } = options;
-        
+
         const openaiMessages = this.convertToOpenAIMessages(messages);
         const openaiTools = this.convertToOpenAITools(tools);
 
-        traceLLMRequest('openai', this.model, openaiMessages, openaiTools);
+        traceLLMRequest("openai", this.model, openaiMessages, openaiTools);
 
         try {
             const response = await this.client.chat.completions.create({
@@ -102,19 +102,19 @@ export class OpenAIAdapter implements LLM {
                 tools: openaiTools.length > 0 ? openaiTools : undefined
             });
 
-            traceLLMResponse('openai', this.model, response);
+            traceLLMResponse("openai", this.model, response);
             return this.convertFromOpenAIResponse(response);
         } catch (error) {
-            traceLLMError('openai', this.model, 'generate', error);
+            traceLLMError("openai", this.model, "generate", error);
             throw error;
         }
     }
 
     async evaluate(messages: Message[], prompt: string): Promise<string> {
-        const evalMessages = [...messages, { role: 'user' as const, content: prompt }];
+        const evalMessages = [...messages, { role: "user" as const, content: prompt }];
         const openaiMessages = this.convertToOpenAIMessages(evalMessages);
 
-        traceLLMRequest('openai', this.model, openaiMessages, []);
+        traceLLMRequest("openai", this.model, openaiMessages, []);
 
         try {
             const response = await this.client.chat.completions.create({
@@ -123,10 +123,10 @@ export class OpenAIAdapter implements LLM {
                 messages: openaiMessages
             });
 
-            traceLLMResponse('openai', this.model, response);
-            return response.choices[0].message.content || '';
+            traceLLMResponse("openai", this.model, response);
+            return response.choices[0].message.content || "";
         } catch (error) {
-            traceLLMError('openai', this.model, 'evaluate', error);
+            traceLLMError("openai", this.model, "evaluate", error);
             throw error;
         }
     }
