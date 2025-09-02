@@ -185,6 +185,7 @@ test-mcp -i
 * [x] Evaluator for natural-language assertions
 * [x] OpenAI support
 * [x] Support for `http` transport
+* [ ] Test parameterization with `${}`
 * [ ] CI-friendly reports
 * [ ] Support for MCP resources
 * [ ] Support for MCP prompts
