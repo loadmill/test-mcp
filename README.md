@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@loadmill/test-mcp"><img src="https://img.shields.io/npm/v/@loadmill/test-mcp?color=green" alt="npm version"></a>
-  <a href="https://discord.gg/ABC"><img src="https://img.shields.io/discord/123?logo=discord&label=discord" alt="Discord"></a>
+  <a href="https://discord.gg/BHAVZUFrWX"><img src="https://img.shields.io/discord/1412375815236091906?logo=discord&label=discord" alt="Discord"></a>
 </p>
 
 <p align="center">
@@ -189,10 +189,10 @@ test-mcp -i
 
 <h2 id="contributing">🤝 Contributing</h2>
 
-Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](./.github/CONTRIBUTING.md).
+Contributions, ideas, and bug reports are welcome! See [CONTRIBUTING.md](https://github.com/loadmill/test-mcp/blob/main/.github/CONTRIBUTING.md).
 
 ---
 
 <h2 id="license">📄 License</h2>
 
-Apache License 2.0 © [Loadmill](LICENSE)
+Apache License 2.0 © [Loadmill](https://github.com/loadmill/test-mcp/blob/main/LICENSE)
