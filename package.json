@@ -1,6 +1,6 @@
 {
   "name": "@loadmill/test-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Headless MCP client for automated testing",
   "main": "build/index.js",
   "bin": {
