@@ -18,7 +18,10 @@
     "start": "node build/index.js",
     "clean": "rm -rf build",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint:fix": "eslint src/ --fix",
+    "prerelease": "npm run lint && npm run build",
+    "release:patch": "npm version patch && npm publish",
+    "postversion": "git push && git push --tags"
   },
   "homepage": "https://github.com/loadmill/test-mcp",
   "repository": {
