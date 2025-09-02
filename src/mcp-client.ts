@@ -331,7 +331,7 @@ IMPORTANT: In the reasoning field, use only plain text. Do not include any JSON,
         } catch (error) {
             return {
                 passed: false,
-                reasoning: `Error evaluating assertion: ${error instanceof Error ? error.message : String(error)}`
+                reasoning: `Error evaluating assertion or parsing its result: ${error instanceof Error ? error.message : String(error)}`
             };
         }
     }
