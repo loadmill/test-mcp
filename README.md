@@ -41,6 +41,7 @@ Together, these let you automate and validate MCP server behavior with simple, r
 **Supported Transports & Providers:**
 - **MCP Servers**: STDIO (local) and HTTP (remote)
 - **LLM Providers**: Anthropic Claude and OpenAI GPT models
+- **MCP Features**: Tools (done), Resources/Prompts/Sampling (planned)
 
 ---
 
@@ -179,11 +180,14 @@ test-mcp -i
 
 * [x] Headless MCP client with Anthropic support
 * [x] Support for `stdio` transport
+* [x] Support for MCP tools
 * [x] Evaluator for natural-language assertions
 * [x] OpenAI support
 * [x] Support for `http` transport
 * [ ] CI-friendly reports
-* [ ] Subfolder/glob test discovery
+* [ ] Support for MCP resources
+* [ ] Support for MCP prompts
+* [ ] Support for MCP sampling
 
 ---
 
