@@ -1,7 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
-import { LLM, Message, Tool, ToolCall, ToolResult, Response } from "./llm/index.js";
+import { LLM, Message, Tool, ToolCall, ToolResult } from "./llm/index.js";
 import { traceMCPToolCall, traceMCPToolResult, traceMCPError } from "./tracing.js";
 import { ResolvedMCPConfig } from "./config-types.js";
 
@@ -143,6 +143,8 @@ export class MCPClient {
 
     async processQueryWithDetails(query: string): Promise<QueryResult> {
         const toolExecutions: ToolExecution[] = [];
+        const maxIterations = 10; // Prevent infinite loops
+        let iteration = 0;
 
         // Add user message to conversation history
         messages.push({ role: "user", content: query });
@@ -152,14 +154,27 @@ export class MCPClient {
             tools: this.tools
         });
 
-        // Process any tool calls
-        if (response.toolCalls.length > 0) {
-            const toolResults = await this.executeToolCalls(response.toolCalls, toolExecutions);
-            response = await this.generateFinalResponse(toolResults);
+        // Keep looping while the model requests tool calls
+        while (response.toolCalls.length > 0 && iteration < maxIterations) {
+            iteration++;
+
+            // Execute all tool calls for this round
+            await this.executeToolCalls(response.toolCalls, toolExecutions);
+
+            // Generate next response based on updated conversation history
+            response = await this.llm.generate(messages, {
+                maxTokens: this.options.maxTokens,
+                tools: this.tools
+            });
         }
 
-        // Add final assistant response to history
-        if (response.textContent || response.toolCalls.length === 0) {
+        // Log if we hit the iteration limit while model still wants to call tools
+        if (iteration >= maxIterations && response.toolCalls.length > 0) {
+            console.warn(`⚠️  Reached maximum iterations (${maxIterations}) but model still requested ${response.toolCalls.length} tool calls. This may indicate an infinite loop or a complex workflow requiring more iterations.`);
+        }
+
+        // Add final assistant response to history (only text content)
+        if (response.textContent) {
             messages.push({
                 role: "assistant",
                 content: response.textContent
@@ -264,13 +279,6 @@ export class MCPClient {
                 execution
             };
         }
-    }
-
-    private async generateFinalResponse(_toolResults: ToolResult[]): Promise<Response> {
-        return await this.llm.generate(messages, {
-            maxTokens: this.options.maxTokens,
-            tools: this.tools
-        });
     }
 
     getMessageSnapshot(): Message[] {
