@@ -234,6 +234,9 @@ export class MCPClient {
             originalToolName: toolRegistration.originalToolName
         };
 
+        // Log tool execution
+        console.log(`🔧 Tool: ${server.name}/${toolRegistration.originalToolName}`);
+        
         traceMCPToolCall(server.name, name, toolRegistration.originalToolName, args, server.type);
 
         try {
@@ -268,6 +271,7 @@ export class MCPClient {
             traceMCPError(server.name, `tool call ${name} (${toolRegistration.originalToolName})`, e);
 
             const errorMsg = `Error calling tool: ${e instanceof Error ? e.message : String(e)}`;
+            console.error(`❌ Tool Error: ${errorMsg}`);
             execution.result = errorMsg;
 
             return {

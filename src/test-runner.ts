@@ -59,13 +59,6 @@ export class TestRunner {
                     const queryResult = await this.mcpClient.processQueryWithDetails(step.prompt);
                     const stepDuration = Date.now() - stepStartTime;
 
-                    // Display any tool executions
-                    if (queryResult.toolExecutions.length > 0) {
-                        for (const execution of queryResult.toolExecutions) {
-                            console.log(`🔧 Tool: ${execution.serverName}/${execution.originalToolName}`);
-                        }
-                    }
-
                     console.log(`✅ Response (${stepDuration}ms):`);
                     console.log(queryResult.response);
 
