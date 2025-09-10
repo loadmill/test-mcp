@@ -56,6 +56,10 @@ npm install -g @loadmill/test-mcp
 pnpm add -g @loadmill/test-mcp
 ````
 
+> [!NOTE]  
+> While `test-mcp` itself can run on Node.js 18 or higher, many popular MCP servers require Node.js 20.  
+> For the smoothest experience, we recommend using **Node.js 20**.
+
 When running from source:
 
 ```bash
