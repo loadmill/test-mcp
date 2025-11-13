@@ -14,6 +14,7 @@
   <a href="#cli-flags">CLI Flags</a> •
   <a href="#test-discovery">Test Discovery</a> •
   <a href="#interactive-mode">Interactive Mode</a> •
+  <a href="#programmatic-api">Programmatic API</a> •
   <a href="#roadmap">Roadmap</a> •
   <a href="#contributing">Contributing</a> •
   <a href="#license">License</a>
@@ -178,6 +179,38 @@ Run the client without tests and chat with your MCP servers:
 ```bash
 test-mcp -i
 ```
+
+---
+
+<h2 id="programmatic-api">🔧 Programmatic API</h2>
+
+You can use `test-mcp` programmatically in your Node.js code:
+
+```javascript
+import { TestMCPClient } from '@loadmill/test-mcp';
+
+const client = new TestMCPClient({
+  llm: {
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+    apiKey: process.env.OPENAI_API_KEY
+  },
+  servers: {
+    myServer: {
+      type: 'stdio',
+      command: 'node',
+      args: ['./server.js']
+    }
+  }
+});
+
+await client.connect();
+const response = await client.prompt('Your question');
+const assertion = await client.assert('Expected behavior');
+await client.disconnect();
+```
+
+See `examples/api-example.js` for a complete example.
 
 ---
 
