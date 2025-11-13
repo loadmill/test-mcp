@@ -40,14 +40,12 @@ async function main() {
         const response = await client.prompt('Roll the dice');
         console.log('Response:', response.text);
         console.log('Tool calls:', response.toolCalls.length);
-        console.log('\n');
 
         // Run an assertion
         console.log('Running assertion...');
         const assertionResult = await client.assert('The dice was rolled successfully');
         console.log('Assertion passed:', assertionResult.passed);
         console.log('Reasoning:', assertionResult.reasoning);
-        console.log('\n');
 
         // Clear history and try another prompt
         console.log('Clearing history and trying another prompt...');
@@ -55,7 +53,6 @@ async function main() {
 
         const response2 = await client.prompt('Roll the dice again');
         console.log('Response:', response2.text);
-        console.log('\n');
 
         console.log('✓ All operations completed successfully!');
 
